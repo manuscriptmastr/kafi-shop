@@ -26,39 +26,70 @@ describe('Coffea Circulor', () => {
       })
       .then(() => {
         urlsToVisit.forEach((url) => {
-          cy.visit(url)
-            .then(() => !!cy.$$(PRODUCT_WEIGHT_SELECTOR).length)
-            .then((isCoffeeProduct) => {
-              if (!isCoffeeProduct) {
-                cy.log('Not a coffee product');
-                return;
-              }
-
-              const name = cy.$$(PRODUCT_TITLE_SELECTOR).text();
-              cy.get(`${PRODUCT_WEIGHT_SELECTOR} option`).then(($weights) => {
-                cy.wrap($weights).each(($weight) => {
-                  const weight = $weight.text();
-                  cy.findByLabelText(/weight/i)
-                    .select(weight, { force: true })
-                    .then(() => {
-                      const price = cy.$$(PRODUCT_COST_SELECTOR).text();
-                      coffees[name] = {
-                        ...coffees[name],
-                        [weight]: price,
-                        url,
-                      };
-                    });
-                });
+          cy.visit(url).then(() => {
+            if (
+              !cy.$$(PRODUCT_WEIGHT_SELECTOR).length ||
+              /hyperfood/i.test(cy.$$(PRODUCT_TITLE_SELECTOR).text()) ||
+              cy.$$('button:contains(Sold out)').length
+            ) {
+              cy.log('Not a coffee product');
+              return;
+            }
+            cy.all([
+              () => cy.get(PRODUCT_TITLE_SELECTOR),
+              () => cy.get(`${PRODUCT_WEIGHT_SELECTOR} option`),
+              () => cy.contains('SCA SCORE').parent(),
+              () =>
+                cy
+                  .findAllByRole('cell', { name: /flavor/i })
+                  .first()
+                  .next(),
+            ]).then(([$name, $weights, $score, $flavors]) => {
+              cy.wrap($weights).each(($weight) => {
+                const name = $name.text();
+                const weight = $weight.text();
+                const score = $score.text().replace('SCA SCORE', '').trim();
+                const flavors = $flavors.text();
+                cy.findByLabelText(/weight/i)
+                  .select(weight, { force: true })
+                  .then(() => {
+                    const price = cy.$$(PRODUCT_COST_SELECTOR).text();
+                    coffees[name] = {
+                      ...coffees[name],
+                      [weight]: price,
+                      url: `${Cypress.config().baseUrl}${url}`,
+                      score,
+                      flavors,
+                    };
+                  });
               });
             });
+          });
         });
       });
   });
 
   after(() => {
+    const coffeesTable = Object.entries(coffees)
+      // @ts-ignore
+      .map(([name, { '250g': weight, url, score, flavors }]) => ({
+        name,
+        price: weight,
+        url,
+        score,
+        flavors,
+      }))
+      .filter(({ price }) => !!price)
+      .map(({ price, ...coffee }) => ({
+        price: Number(price.slice(1).replace(',', '')) / 100,
+        ...coffee,
+      }))
+      .sort((a, b) => a.price - b.price)
+      .filter(({ price }) => price <= 30);
+
     cy.writeFile(
       `./coffea-circulor/${Date.now()}.json`,
-      JSON.stringify(coffees, null, 2),
+      JSON.stringify(coffeesTable, null, 2),
     );
   });
 });
