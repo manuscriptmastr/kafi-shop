@@ -42,7 +42,11 @@ describe('Coffea Circulor', () => {
                     .select(weight, { force: true })
                     .then(() => {
                       const price = cy.$$(PRODUCT_COST_SELECTOR).text();
-                      coffees[name] = { ...coffees[name], [weight]: price };
+                      coffees[name] = {
+                        ...coffees[name],
+                        [weight]: price,
+                        url,
+                      };
                     });
                 });
               });
