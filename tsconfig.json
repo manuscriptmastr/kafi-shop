@@ -1,6 +1,6 @@
 {
-  "compilerOptions": {
-    "types": ["cypress", "@testing-library/cypress"],
-    "lib": ["ESNext"]
-  }
+	"compilerOptions": {
+		"module": "NodeNext",
+		"target": "ESNext"
+	}
 }

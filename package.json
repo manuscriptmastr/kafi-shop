@@ -2,19 +2,17 @@
   "name": "kafi-shop",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "lint": "prettier --write .",
-    "cypress": "cypress run",
-    "cypress:open": "cypress open"
+    "start": "ts-node src/index.ts",
+    "lint": "prettier --write ."
   },
   "author": "Joshua Martin",
   "license": "ISC",
-  "devDependencies": {
-    "@testing-library/cypress": "^9.0.0",
-    "cypress": "^13.1.0",
-    "prettier": "^3.0.3",
-    "prettier-plugin-organize-imports": "^3.2.3",
+  "dependencies": {
+    "@types/puppeteer": "^7.0.4",
+    "pptr-testing-library": "^0.7.0",
+    "puppeteer": "^21.2.1",
+    "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }
 }
