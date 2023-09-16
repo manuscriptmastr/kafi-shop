@@ -2,7 +2,7 @@ import puppeteer, { ElementHandle } from 'puppeteer';
 import { limit } from './utils/semaphore';
 // import 'pptr-testing-library/extend';
 
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const PRODUCT = {
   DOMAIN: 'https://coffeacirculor.com',
@@ -38,6 +38,7 @@ const PRODUCT = {
 };
 
 (async () => {
+  const startTime = performance.now();
   const browser = await puppeteer.launch({ headless: 'new' });
   const page = await browser.newPage();
   await page.goto(PRODUCT.LIST.URL);
@@ -109,4 +110,5 @@ const PRODUCT = {
   console.log(products);
 
   await browser.close();
+  console.log(`Took ${performance.now() - startTime}ms`);
 })();

@@ -20,9 +20,9 @@ const Semaphore = (max: number) => {
       setImmediate(dispatch);
     });
 
-  return async (fn: Function) => {
+  return async <T extends (...args: any[]) => any>(fn: T) => {
     await acquire();
-    let result;
+    let result: ReturnType<T> | undefined;
     try {
       result = await fn();
     } catch (e) {
@@ -34,9 +34,9 @@ const Semaphore = (max: number) => {
   };
 };
 
-export let limit = <T extends Function>(max: number, fn: Function) => {
+export let limit = <T extends (...args: any[]) => any>(max: number, fn: T) => {
   let semaphore = Semaphore(max);
-  return (...args) => semaphore(() => fn(...args));
+  return (...args: Parameters<T>) => semaphore(() => fn(...args));
 };
 
 export default Semaphore;
