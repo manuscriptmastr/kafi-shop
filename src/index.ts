@@ -29,8 +29,7 @@ const PRODUCT = {
       SELECTOR: 'span.product-price',
     },
     SIZE: {
-      SELECTOR:
-        '[data-text="250g"] span, [data-text="250g (Customer Expectancy Price)"] span, [data-text="250g (True Development Cost)"] span',
+      SELECTOR: '[data-text^="250g"] span',
     },
     SCORE: {
       SELECTOR: 'text/SCA SCORE',
