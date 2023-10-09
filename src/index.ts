@@ -29,7 +29,8 @@ const PRODUCT = {
       SELECTOR: 'span.product-price',
     },
     SIZE: {
-      SELECTOR: '[data-text="250g"] span',
+      SELECTOR:
+        '[data-text="250g"] span, [data-text="250g (Customer Expectancy Price)"] span, [data-text="250g (True Development Cost)"] span',
     },
     SCORE: {
       SELECTOR: 'text/SCA SCORE',
@@ -63,21 +64,31 @@ const PRODUCT = {
         const url = `${PRODUCT.DOMAIN}${path}`;
         const page = await browser.newPage();
         await page.goto(url);
-        const size = await page.$(PRODUCT.DETAIL.SIZE.SELECTOR);
-        if (!size) {
+        const sizes = await page.$$(PRODUCT.DETAIL.SIZE.SELECTOR);
+
+        const prices = [];
+
+        for (const size of sizes) {
+          await size.click();
+          const addToCartButton = await page.$(
+            PRODUCT.DETAIL.ADD_TO_CART.SELECTOR
+          );
+          //@ts-ignore
+          if (!(await addToCartButton.evaluate((el) => el.disabled))) {
+            const price = await (
+              await page.$(PRODUCT.DETAIL.PRICE.SELECTOR)
+            ).evaluate((el) => +el.textContent.slice(1).replace(',', '') / 100);
+
+            prices.push(price);
+          }
+        }
+
+        if (!prices.length) {
           page.close();
           return;
         }
 
-        await size.click();
-        const addToCartButton = await page.$(
-          PRODUCT.DETAIL.ADD_TO_CART.SELECTOR
-        );
-        //@ts-ignore
-        if (await addToCartButton.evaluate((el) => el.disabled)) {
-          page.close();
-          return;
-        }
+        const price = Math.min(...prices);
 
         const flavors = await (
           await page.$(PRODUCT.DETAIL.FLAVOR.SELECTOR)
@@ -86,10 +97,6 @@ const PRODUCT = {
         const name = await (
           await page.$(PRODUCT.DETAIL.NAME.SELECTOR)
         ).evaluate((el) => el.textContent);
-
-        const price = await (
-          await page.$(PRODUCT.DETAIL.PRICE.SELECTOR)
-        ).evaluate((el) => +el.textContent.slice(1).replace(',', '') / 100);
 
         const score = await (
           await page.$(PRODUCT.DETAIL.SCORE.SELECTOR)
@@ -106,7 +113,7 @@ const PRODUCT = {
   const products = unfilteredProducts
     .filter((p) => p)
     .sort((a, b) => a.price - b.price)
-    .filter(({ price }) => price <= 30);
+    .filter(({ price }) => price <= 20);
   console.log(products);
 
   await browser.close();
