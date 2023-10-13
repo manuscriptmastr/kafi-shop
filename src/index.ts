@@ -1,6 +1,5 @@
 import puppeteer, { ElementHandle } from 'puppeteer';
 import { limit } from './utils/semaphore';
-// import 'pptr-testing-library/extend';
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -43,16 +42,11 @@ const PRODUCT = {
   const page = await browser.newPage();
   await page.goto(PRODUCT.LIST.URL);
 
-  const moreProductsButton = await page.waitForSelector(
-    PRODUCT.LIST.MORE.SELECTOR
-  );
-
-  await moreProductsButton.click();
-  await wait(1000);
-  await moreProductsButton.click();
-  await wait(1000);
-  await moreProductsButton.click();
-  await wait(1000);
+  while (await page.$(PRODUCT.LIST.MORE.SELECTOR)) {
+    const moreProductsButton = await page.$(PRODUCT.LIST.MORE.SELECTOR);
+    await moreProductsButton.click();
+    await wait(1000);
+  }
 
   const productDetailCards = await page.$$(PRODUCT.LIST.DETAIL.SELECTOR);
 
