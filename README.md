@@ -10,7 +10,7 @@ Web scraper for specialty coffee. Currently supports:
 ## CLI
 
 ```shell
-npm run <coffea-circulor|manhattan>
+npm run <coffea-circulor|manhattan|onyx|passenger>
 ```
 
 _Note: Requires Node and NPM._
