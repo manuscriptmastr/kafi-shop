@@ -1,6 +1,6 @@
 # kafi-shop
 
-Web Scraper for specialty coffee. Currently supports:
+Web scraper for specialty coffee. Currently supports:
 
 - Coffea Circulor
 - Manhattan Coffee Roasters
