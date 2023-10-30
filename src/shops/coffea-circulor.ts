@@ -1,7 +1,6 @@
 import puppeteer, { ElementHandle } from 'puppeteer';
-import { limit } from './utils/semaphore';
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { limit } from '../utils/semaphore';
+import { wait } from '../utils/async';
 
 const PRODUCT = {
   DOMAIN: 'https://coffeacirculor.com',
