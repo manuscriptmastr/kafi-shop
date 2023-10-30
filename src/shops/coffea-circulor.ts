@@ -2,8 +2,9 @@ import puppeteer, { ElementHandle } from 'puppeteer';
 import { limit } from '../utils/semaphore';
 import { wait } from '../utils/async';
 
+const DOMAIN = 'https://coffeacirculor.com';
+
 const PRODUCT = {
-  DOMAIN: 'https://coffeacirculor.com',
   LIST: {
     DETAIL: {
       SELECTOR: 'a.product-item:not(:has(.sold))',
@@ -36,7 +37,6 @@ const PRODUCT = {
 };
 
 (async () => {
-  const startTime = performance.now();
   const browser = await puppeteer.launch({ headless: 'new' });
   const page = await browser.newPage();
   await page.goto(PRODUCT.LIST.URL);
@@ -53,7 +53,7 @@ const PRODUCT = {
     productDetailCards.map(
       limit(10, async (card: ElementHandle) => {
         const path = await card.evaluate((el) => el.getAttribute('href'));
-        const url = `${PRODUCT.DOMAIN}${path}`;
+        const url = `${DOMAIN}${path}`;
         const page = await browser.newPage();
         await page.goto(url);
         const sizes = await page.$$(PRODUCT.DETAIL.SIZE.SELECTOR);
@@ -106,8 +106,8 @@ const PRODUCT = {
     .filter((p) => p)
     .sort((a, b) => a.price - b.price)
     .filter(({ price }) => price <= 20);
+
   console.log(products);
 
   await browser.close();
-  console.log(`Took ${performance.now() - startTime}ms`);
 })();
