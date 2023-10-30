@@ -1,6 +1,6 @@
 import puppeteer, { ElementHandle } from 'puppeteer';
 import { limit } from '../utils/semaphore';
-import { wait } from '../utils/async';
+import { mapAsync, wait } from '../utils/async';
 
 const DOMAIN = 'https://coffeacirculor.com';
 
@@ -49,57 +49,54 @@ const PRODUCT = {
 
   const productDetailCards = await page.$$(PRODUCT.LIST.DETAIL.SELECTOR);
 
-  const unfilteredProducts = await Promise.all(
-    productDetailCards.map(
-      limit(10, async (card: ElementHandle) => {
-        const path = await card.evaluate((el) => el.getAttribute('href'));
-        const url = `${DOMAIN}${path}`;
-        const page = await browser.newPage();
-        await page.goto(url);
-        const sizes = await page.$$(PRODUCT.DETAIL.SIZE.SELECTOR);
+  const unfilteredProducts = await mapAsync(
+    productDetailCards,
+    limit(10, async (card: ElementHandle) => {
+      const path = await card.evaluate((el) => el.getAttribute('href'));
+      const url = `${DOMAIN}${path}`;
+      const page = await browser.newPage();
+      await page.goto(url);
+      const sizes = await page.$$(PRODUCT.DETAIL.SIZE.SELECTOR);
 
-        const prices = [];
+      const prices = [];
 
-        for (const size of sizes) {
-          await size.click();
-          const addToCartButton = await page.$(
-            PRODUCT.DETAIL.ADD_TO_CART.SELECTOR,
-          );
-          //@ts-ignore
-          if (!(await addToCartButton.evaluate((el) => el.disabled))) {
-            const price = await (
-              await page.$(PRODUCT.DETAIL.PRICE.SELECTOR)
-            ).evaluate((el) => +el.textContent.slice(1).replace(',', '') / 100);
-
-            prices.push(price);
-          }
-        }
-
-        if (!prices.length) {
-          page.close();
-          return;
-        }
-
-        const price = Math.min(...prices);
-
-        const flavors = await (
-          await page.$(PRODUCT.DETAIL.FLAVOR.SELECTOR)
-        ).evaluate((el) => el.nextElementSibling.textContent);
-
-        const name = await (
-          await page.$(PRODUCT.DETAIL.NAME.SELECTOR)
-        ).evaluate((el) => el.textContent);
-
-        const score = await (
-          await page.$(PRODUCT.DETAIL.SCORE.SELECTOR)
-        ).evaluate(
-          (el) => el.parentElement.textContent.split(/SCA SCORE\s/)[1],
+      for (const size of sizes) {
+        await size.click();
+        const addToCartButton = await page.$(
+          PRODUCT.DETAIL.ADD_TO_CART.SELECTOR,
         );
+        //@ts-ignore
+        if (!(await addToCartButton.evaluate((el) => el.disabled))) {
+          const price = await (
+            await page.$(PRODUCT.DETAIL.PRICE.SELECTOR)
+          ).evaluate((el) => +el.textContent.slice(1).replace(',', '') / 100);
 
-        await page.close();
-        return { name, flavors, price, score, url };
-      }),
-    ),
+          prices.push(price);
+        }
+      }
+
+      if (!prices.length) {
+        page.close();
+        return;
+      }
+
+      const price = Math.min(...prices);
+
+      const flavors = await (
+        await page.$(PRODUCT.DETAIL.FLAVOR.SELECTOR)
+      ).evaluate((el) => el.nextElementSibling.textContent);
+
+      const name = await (
+        await page.$(PRODUCT.DETAIL.NAME.SELECTOR)
+      ).evaluate((el) => el.textContent);
+
+      const score = await (
+        await page.$(PRODUCT.DETAIL.SCORE.SELECTOR)
+      ).evaluate((el) => el.parentElement.textContent.split(/SCA SCORE\s/)[1]);
+
+      await page.close();
+      return { name, flavors, price, score, url };
+    }),
   );
 
   const products = unfilteredProducts

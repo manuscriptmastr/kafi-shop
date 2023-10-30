@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer';
 import { limit } from '../utils/semaphore';
 import currency from 'currency.js';
+import { mapAsync } from '../utils/async';
 
 const DOMAIN = 'https://manhattancoffeeroasters.com';
 
@@ -15,48 +16,45 @@ const DOMAIN = 'https://manhattancoffeeroasters.com';
     (anchors) => anchors.map((a) => a.href),
   );
 
-  const unfilteredProducts = await Promise.all(
-    urls.map(
-      limit(10, async (url) => {
-        const page = await browser.newPage();
-        await page.goto(url);
+  const unfilteredProducts = await mapAsync(
+    urls,
+    limit(10, async (url) => {
+      const page = await browser.newPage();
+      await page.goto(url);
 
-        const filterButton = await page.$('button::-p-text(Filter)');
+      const filterButton = await page.$('button::-p-text(Filter)');
 
-        if (!filterButton) {
-          page.close();
-          return;
-        }
+      if (!filterButton) {
+        page.close();
+        return;
+      }
 
-        await filterButton.click();
+      await filterButton.click();
 
-        const priceText = await page.$eval(
-          '::-p-text(250 gram whole coffee beans)',
-          (el) =>
-            el.parentElement.nextElementSibling.firstElementChild.textContent.trim(),
-        );
+      const priceText = await page.$eval(
+        '::-p-text(250 gram whole coffee beans)',
+        (el) =>
+          el.parentElement.nextElementSibling.firstElementChild.textContent.trim(),
+      );
 
-        const price = currency(priceText, {
-          symbol: '',
-          decimal: ',',
-        }).format({ decimal: '.' });
+      const price = currency(priceText, {
+        symbol: '',
+        decimal: ',',
+      }).value;
 
-        const name = await page.$eval('h1', (h1) => h1.textContent.trim());
+      const name = await page.$eval('h1', (h1) => h1.textContent.trim());
 
-        const flavors = await page.$eval('::-p-text(tastes like)', (el) =>
-          Array.from(
-            el.parentElement.parentElement.querySelectorAll(
-              'li.overflow-hidden',
-            ),
-          )
-            .map((el) => el.firstElementChild.textContent.trim())
-            .join(', '),
-        );
+      const flavors = await page.$eval('::-p-text(tastes like)', (el) =>
+        Array.from(
+          el.parentElement.parentElement.querySelectorAll('li.overflow-hidden'),
+        )
+          .map((el) => el.firstElementChild.textContent.trim())
+          .join(', '),
+      );
 
-        await page.close();
-        return { name, flavors, price, score: 'N/A', url };
-      }),
-    ),
+      await page.close();
+      return { name, flavors, price, score: 'N/A', url };
+    }),
   );
 
   const products = unfilteredProducts

@@ -5,6 +5,7 @@
   "scripts": {
     "coffea-circulor": "ts-node src/shops/coffea-circulor.ts",
     "manhattan": "ts-node src/shops/manhattan.ts",
+    "onyx": "ts-node src/shops/onyx.ts",
     "lint": "prettier --write ."
   },
   "author": "Joshua Martin",

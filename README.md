@@ -2,8 +2,9 @@
 
 Web scraper for specialty coffee. Currently supports:
 
-- Coffea Circulor
-- Manhattan Coffee Roasters
+- [Coffea Circulor](https://coffeacirculor.com/)
+- [Manhattan Coffee Roasters](https://manhattancoffeeroasters.com/)
+- [Onyx Coffee Lab](https://onyxcoffeelab.com/)
 
 ## CLI
 
