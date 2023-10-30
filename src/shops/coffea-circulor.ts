@@ -63,7 +63,7 @@ const PRODUCT = {
         for (const size of sizes) {
           await size.click();
           const addToCartButton = await page.$(
-            PRODUCT.DETAIL.ADD_TO_CART.SELECTOR
+            PRODUCT.DETAIL.ADD_TO_CART.SELECTOR,
           );
           //@ts-ignore
           if (!(await addToCartButton.evaluate((el) => el.disabled))) {
@@ -93,13 +93,13 @@ const PRODUCT = {
         const score = await (
           await page.$(PRODUCT.DETAIL.SCORE.SELECTOR)
         ).evaluate(
-          (el) => el.parentElement.textContent.split(/SCA SCORE\s/)[1]
+          (el) => el.parentElement.textContent.split(/SCA SCORE\s/)[1],
         );
 
         await page.close();
         return { name, flavors, price, score, url };
-      })
-    )
+      }),
+    ),
   );
 
   const products = unfilteredProducts
