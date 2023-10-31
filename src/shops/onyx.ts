@@ -9,18 +9,19 @@ const DOMAIN = 'https://onyxcoffeelab.com';
 
 export class Onyx implements CoffeeShop {
   async getUrls(page: Page) {
-    return [];
+    await page.goto(`${DOMAIN}/collections/coffee`);
+
+    return page.$$eval(
+      'a.product-preview[href^="/products/"]',
+      (anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href),
+    );
   }
 
   async getProducts() {
     const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
-    await page.goto(`${DOMAIN}/collections/coffee`);
 
-    const urls = await page.$$eval(
-      'a.product-preview[href^="/products/"]',
-      (anchors) => anchors.map((a) => a.href),
-    );
+    const urls = await this.getUrls(page);
 
     const unfilteredProducts: Coffee[] = await mapAsync(
       urls,

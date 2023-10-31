@@ -9,18 +9,12 @@ const DOMAIN = 'https://www.passengercoffee.com';
 
 export class Passenger implements CoffeeShop {
   async getUrls(page: Page) {
-    return [];
-  }
-
-  async getProducts() {
-    const browser = await puppeteer.launch({ headless: 'new' });
-    const page = await browser.newPage();
     await page.goto(`${DOMAIN}/collections/coffee`);
 
     await page.waitForNetworkIdle();
     await wait(3000);
 
-    const urls = await page.$$eval(
+    return page.$$eval(
       'div.product-data:not(:has(.sold-out)) a[href^="/products/"]',
       (anchors: HTMLAnchorElement[]) =>
         anchors
@@ -28,6 +22,13 @@ export class Passenger implements CoffeeShop {
           .filter((a) => !/decaf/gi.test(a.textContent!))
           .map((a) => a.href),
     );
+  }
+
+  async getProducts() {
+    const browser = await puppeteer.launch({ headless: 'new' });
+    const page = await browser.newPage();
+
+    const urls = await this.getUrls(page);
 
     const unfilteredProducts: Coffee[] = await mapAsync(
       urls.slice(0, 10),

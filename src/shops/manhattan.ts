@@ -9,19 +9,19 @@ const DOMAIN = 'https://manhattancoffeeroasters.com';
 
 export class Manhattan implements CoffeeShop {
   async getUrls(page: Page) {
-    return [];
+    await page.goto(`${DOMAIN}/catalog/coffee`);
+
+    return page.$$eval(
+      `a[href^="${DOMAIN}/catalog/coffee/"]`,
+      (anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href),
+    );
   }
 
   async getProducts() {
     const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
 
-    await page.goto(`${DOMAIN}/catalog/coffee`);
-
-    const urls = await page.$$eval(
-      `a[href^="${DOMAIN}/catalog/coffee/"]`,
-      (anchors) => anchors.map((a) => a.href),
-    );
+    const urls = await this.getUrls(page);
 
     const unfilteredProducts: Coffee[] = await mapAsync(
       urls,
