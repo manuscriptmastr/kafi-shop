@@ -4,9 +4,7 @@
     "outDir": "dist",
     "module": "NodeNext",
     "target": "ESNext",
-    "strict": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true
+    "strict": true
   },
   "include": ["**/*.ts"]
 }

@@ -1,21 +1,37 @@
 import 'dotenv/config';
-import { readdir } from 'fs/promises';
-import { dirname, parse } from 'path';
-import { fileURLToPath } from 'url';
+import { CoffeaCirculor } from './shops/coffea-circulor.js';
+import { Manhattan } from './shops/manhattan.js';
+import { Onyx } from './shops/onyx.js';
+import { Passenger } from './shops/passenger.js';
+import { CoffeeShop } from './models/coffee-shop.js';
 
-const SHOPS = (
-  await readdir(`${dirname(fileURLToPath(import.meta.url))}/shops`)
-).map((file) => parse(file).name);
+enum CoffeeShopEnum {
+  CoffeaCirculor = 'coffea-circulor',
+  Manhattan = 'manhattan',
+  Onyx = 'onyx',
+  Passenger = 'passenger',
+}
 
-const SHOP = process.argv[2];
+const SHOPS: { [K in CoffeeShopEnum]: CoffeeShop } = {
+  [CoffeeShopEnum.CoffeaCirculor]: new CoffeaCirculor(),
+  [CoffeeShopEnum.Manhattan]: new Manhattan(),
+  [CoffeeShopEnum.Onyx]: new Onyx(),
+  [CoffeeShopEnum.Passenger]: new Passenger(),
+};
 
-if (!SHOPS.includes(SHOP)) {
+const shop = process.argv[2] as CoffeeShopEnum;
+
+if (!Object.values(CoffeeShopEnum).includes(shop)) {
   console.error(
-    `"${SHOP}" is not supported. Currently supported shops: ${SHOPS.map(
-      (s) => `"${s}"`,
-    ).join(', ')}`,
+    `"${shop}" is not supported. Currently supported shops: ${Object.values(
+      CoffeeShopEnum,
+    )
+      .map((s) => `"${s}"`)
+      .join(', ')}`,
   );
   process.exit();
 }
 
-await import(`./shops/${SHOP}.js`);
+const products = await SHOPS[shop].getProducts();
+
+console.log(products);
