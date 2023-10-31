@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer';
 import { mapAsync } from '../utils/async.js';
 import { limit } from '../utils/semaphore.js';
 import currency from 'currency.js';
+import { Coffee } from '../models/coffee.ts';
 
 const DOMAIN = 'https://onyxcoffeelab.com';
 
@@ -16,7 +17,7 @@ const urls = await page.$$eval(
 
 const unfilteredProducts = await mapAsync(
   urls,
-  limit(10, async (url: string) => {
+  limit(10, async (url: string): Promise<Coffee | null> => {
     const page = await browser.newPage();
     await page.goto(url);
 
@@ -24,7 +25,7 @@ const unfilteredProducts = await mapAsync(
 
     if (!size) {
       page.close();
-      return;
+      return null;
     }
 
     await size.click();

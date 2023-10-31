@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer';
 import { limit } from '../utils/semaphore.js';
 import { mapAsync, wait } from '../utils/async.js';
+import { Coffee } from '../models/coffee.ts';
 
 const DOMAIN = 'https://coffeacirculor.com';
 
@@ -22,7 +23,7 @@ const urls = await page.$$eval('a.product-item:not(:has(.sold))', (anchors) =>
 
 const unfilteredProducts = await mapAsync(
   urls,
-  limit(10, async (url: string) => {
+  limit(10, async (url: string): Promise<Coffee | null> => {
     const page = await browser.newPage();
     await page.goto(url);
     const sizes = await page.$$('[data-text^="250g"] span');
@@ -47,7 +48,7 @@ const unfilteredProducts = await mapAsync(
 
     if (!prices.length) {
       page.close();
-      return;
+      return null;
     }
 
     const price = Math.min(...prices);
