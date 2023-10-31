@@ -31,7 +31,7 @@ export class Passenger implements CoffeeShop {
     const urls = await this.getUrls(page);
 
     const unfilteredProducts: Coffee[] = await mapAsync(
-      urls.slice(0, 10),
+      urls,
       limit(10, async (url: string): Promise<Coffee | null> => {
         const page = await browser.newPage();
         await page.goto(url);
