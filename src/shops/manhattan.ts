@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
-import { limit } from '../utils/semaphore';
+import { limit } from '../utils/semaphore.js';
 import currency from 'currency.js';
-import { mapAsync } from '../utils/async';
+import { mapAsync } from '../utils/async.js';
 
 const DOMAIN = 'https://manhattancoffeeroasters.com';
 
@@ -34,7 +34,7 @@ const DOMAIN = 'https://manhattancoffeeroasters.com';
       const priceText = await page.$eval(
         '::-p-text(250 gram whole coffee beans)',
         (el) =>
-          el.parentElement.nextElementSibling.firstElementChild.textContent.trim(),
+          el.parentElement!.nextElementSibling!.firstElementChild!.textContent!.trim(),
       );
 
       const price = currency(priceText, {
@@ -42,13 +42,15 @@ const DOMAIN = 'https://manhattancoffeeroasters.com';
         decimal: ',',
       }).value;
 
-      const name = await page.$eval('h1', (h1) => h1.textContent.trim());
+      const name = await page.$eval('h1', (h1) => h1.textContent!.trim());
 
       const flavors = await page.$eval('::-p-text(tastes like)', (el) =>
         Array.from(
-          el.parentElement.parentElement.querySelectorAll('li.overflow-hidden'),
+          el.parentElement!.parentElement!.querySelectorAll(
+            'li.overflow-hidden',
+          ),
         )
-          .map((el) => el.firstElementChild.textContent.trim())
+          .map((el) => el.firstElementChild!.textContent!.trim())
           .join(', '),
       );
 

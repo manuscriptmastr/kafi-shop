@@ -1,10 +1,11 @@
-const Semaphore = (max: number) => {
-  const tasks = [];
+const Semaphore = <T extends (...args: any[]) => Promise<any>>(max: number) => {
+  const tasks: ((value: unknown) => void)[] = [];
   let counter = max;
 
   let dispatch = () => {
     if (counter > 0 && tasks.length > 0) {
       counter--;
+      // @ts-ignore
       tasks.shift()();
     }
   };
@@ -20,7 +21,7 @@ const Semaphore = (max: number) => {
       setImmediate(dispatch);
     });
 
-  return async <T extends (...args: any[]) => any>(fn: T) => {
+  return async (fn: T) => {
     await acquire();
     let result: ReturnType<T> | undefined;
     try {

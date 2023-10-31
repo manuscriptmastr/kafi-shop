@@ -2,11 +2,12 @@
   "name": "kafi-shop",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "scripts": {
-    "coffea-circulor": "ts-node src/shops/coffea-circulor.ts",
-    "manhattan": "ts-node src/shops/manhattan.ts",
-    "onyx": "ts-node src/shops/onyx.ts",
-    "passenger": "ts-node src/shops/passenger.ts",
+    "coffea-circulor": "tsc && node dist/shops/coffea-circulor.js",
+    "manhattan": "tsc && node dist/shops/manhattan.js",
+    "onyx": "tsc && node dist/shops/onyx.js",
+    "passenger": "tsc && node dist/shops/passenger.js",
     "lint": "prettier --write ."
   },
   "author": "Joshua Martin",
@@ -14,7 +15,6 @@
   "dependencies": {
     "currency.js": "^2.0.4",
     "puppeteer": "^21.2.1",
-    "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
   "devDependencies": {

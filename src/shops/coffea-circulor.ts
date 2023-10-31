@@ -1,6 +1,6 @@
 import puppeteer, { ElementHandle } from 'puppeteer';
-import { limit } from '../utils/semaphore';
-import { mapAsync, wait } from '../utils/async';
+import { limit } from '../utils/semaphore.js';
+import { mapAsync, wait } from '../utils/async.js';
 
 const DOMAIN = 'https://coffeacirculor.com';
 
@@ -42,7 +42,7 @@ const PRODUCT = {
   await page.goto(PRODUCT.LIST.URL);
 
   while (await page.$(PRODUCT.LIST.MORE.SELECTOR)) {
-    const moreProductsButton = await page.$(PRODUCT.LIST.MORE.SELECTOR);
+    const moreProductsButton = (await page.$(PRODUCT.LIST.MORE.SELECTOR))!;
     await moreProductsButton.click();
     await wait(1000);
   }
@@ -67,9 +67,11 @@ const PRODUCT = {
         );
         //@ts-ignore
         if (!(await addToCartButton.evaluate((el) => el.disabled))) {
-          const price = await (
-            await page.$(PRODUCT.DETAIL.PRICE.SELECTOR)
-          ).evaluate((el) => +el.textContent.slice(1).replace(',', '') / 100);
+          const price = await (await page.$(
+            PRODUCT.DETAIL.PRICE.SELECTOR,
+          ))!.evaluate(
+            (el) => +el.textContent!.slice(1).replace(',', '') / 100,
+          );
 
           prices.push(price);
         }
@@ -82,17 +84,19 @@ const PRODUCT = {
 
       const price = Math.min(...prices);
 
-      const flavors = await (
-        await page.$(PRODUCT.DETAIL.FLAVOR.SELECTOR)
-      ).evaluate((el) => el.nextElementSibling.textContent);
+      const flavors = await (await page.$(
+        PRODUCT.DETAIL.FLAVOR.SELECTOR,
+      ))!.evaluate((el) => el.nextElementSibling!.textContent!);
 
-      const name = await (
-        await page.$(PRODUCT.DETAIL.NAME.SELECTOR)
-      ).evaluate((el) => el.textContent);
+      const name = await (await page.$(PRODUCT.DETAIL.NAME.SELECTOR))!.evaluate(
+        (el) => el.textContent!,
+      );
 
-      const score = await (
-        await page.$(PRODUCT.DETAIL.SCORE.SELECTOR)
-      ).evaluate((el) => el.parentElement.textContent.split(/SCA SCORE\s/)[1]);
+      const score = await (await page.$(
+        PRODUCT.DETAIL.SCORE.SELECTOR,
+      ))!.evaluate(
+        (el) => el.parentElement!.textContent!.split(/SCA SCORE\s/)[1],
+      );
 
       await page.close();
       return { name, flavors, price, score, url };

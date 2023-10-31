@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer';
-import { mapAsync, wait } from '../utils/async';
-import { limit } from '../utils/semaphore';
+import { mapAsync, wait } from '../utils/async.js';
+import { limit } from '../utils/semaphore.js';
 import currency from 'currency.js';
 
 const DOMAIN = 'https://www.passengercoffee.com';
@@ -17,8 +17,8 @@ const DOMAIN = 'https://www.passengercoffee.com';
     'div.product-data:not(:has(.sold-out)) a[href^="/products/"]',
     (anchors: HTMLAnchorElement[]) =>
       anchors
-        .filter((a) => !/instant/gi.test(a.textContent))
-        .filter((a) => !/decaf/gi.test(a.textContent))
+        .filter((a) => !/instant/gi.test(a.textContent!))
+        .filter((a) => !/decaf/gi.test(a.textContent!))
         .map((a) => a.href),
   );
 
@@ -51,19 +51,19 @@ const DOMAIN = 'https://www.passengercoffee.com';
 
       const priceText = await page.$eval(
         '.product-top--details .product-top--details-price span[data-product-price]',
-        (span) => span.textContent.trim(),
+        (span) => span.textContent!.trim(),
       );
 
       const price = currency(priceText).value;
 
       const name = await page.$eval(
         '.product-top--details .product-label--title h2 span',
-        (span) => span.textContent.trim(),
+        (span) => span.textContent!.trim(),
       );
 
       const flavors = await page.$$eval(
         '.product-top--details .product-label--notes ul li',
-        (lis) => lis.map((li) => li.textContent.trim()).join(', '),
+        (lis) => lis.map((li) => li.textContent!.trim()).join(', '),
       );
 
       await page.close();
