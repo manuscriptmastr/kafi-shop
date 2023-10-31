@@ -1,75 +1,44 @@
-import puppeteer, { ElementHandle } from 'puppeteer';
+import puppeteer from 'puppeteer';
 import { limit } from '../utils/semaphore.js';
 import { mapAsync, wait } from '../utils/async.js';
 
 const DOMAIN = 'https://coffeacirculor.com';
 
-const PRODUCT = {
-  LIST: {
-    DETAIL: {
-      SELECTOR: 'a.product-item:not(:has(.sold))',
-    },
-    MORE: {
-      SELECTOR: '#section-collection a.block-fade',
-    },
-    URL: 'https://coffeacirculor.com/collections/all',
-  },
-  DETAIL: {
-    ADD_TO_CART: {
-      SELECTOR: 'button[name="add"]',
-    },
-    FLAVOR: {
-      SELECTOR: 'text/Flavor',
-    },
-    NAME: {
-      SELECTOR: 'h1.product-title',
-    },
-    PRICE: {
-      SELECTOR: 'span.product-price',
-    },
-    SIZE: {
-      SELECTOR: '[data-text^="250g"] span',
-    },
-    SCORE: {
-      SELECTOR: 'text/SCA SCORE',
-    },
-  },
-};
-
 (async () => {
   const browser = await puppeteer.launch({ headless: 'new' });
   const page = await browser.newPage();
-  await page.goto(PRODUCT.LIST.URL);
+  await page.goto(`${DOMAIN}/collections/all`);
 
-  while (await page.$(PRODUCT.LIST.MORE.SELECTOR)) {
-    const moreProductsButton = (await page.$(PRODUCT.LIST.MORE.SELECTOR))!;
+  while (await page.$('#section-collection a.block-fade')) {
+    const moreProductsButton = (await page.$(
+      '#section-collection a.block-fade',
+    ))!;
     await moreProductsButton.click();
     await wait(1000);
   }
 
-  const productDetailCards = await page.$$(PRODUCT.LIST.DETAIL.SELECTOR);
+  const urls = await page.$$eval('a.product-item:not(:has(.sold))', (anchors) =>
+    anchors.map((a) => a.href),
+  );
 
   const unfilteredProducts = await mapAsync(
-    productDetailCards,
-    limit(10, async (card: ElementHandle) => {
-      const path = await card.evaluate((el) => el.getAttribute('href'));
-      const url = `${DOMAIN}${path}`;
+    urls,
+    limit(10, async (url: string) => {
       const page = await browser.newPage();
       await page.goto(url);
-      const sizes = await page.$$(PRODUCT.DETAIL.SIZE.SELECTOR);
+      const sizes = await page.$$('[data-text^="250g"] span');
 
       const prices = [];
 
       for (const size of sizes) {
         await size.click();
-        const addToCartButton = await page.$(
-          PRODUCT.DETAIL.ADD_TO_CART.SELECTOR,
+        const isAddToCartDisabled = await page.$eval(
+          'button[name="add"]',
+          (button) => button.disabled,
         );
-        //@ts-ignore
-        if (!(await addToCartButton.evaluate((el) => el.disabled))) {
-          const price = await (await page.$(
-            PRODUCT.DETAIL.PRICE.SELECTOR,
-          ))!.evaluate(
+        if (!isAddToCartDisabled) {
+          const price = await page.$eval(
+            'span.product-price',
             (el) => +el.textContent!.slice(1).replace(',', '') / 100,
           );
 
@@ -84,18 +53,21 @@ const PRODUCT = {
 
       const price = Math.min(...prices);
 
-      const flavors = await (await page.$(
-        PRODUCT.DETAIL.FLAVOR.SELECTOR,
-      ))!.evaluate((el) => el.nextElementSibling!.textContent!);
+      const flavors = await page.$eval(
+        'text/Flavor',
+        (el) => el.nextElementSibling!.textContent!,
+      );
 
-      const name = await (await page.$(PRODUCT.DETAIL.NAME.SELECTOR))!.evaluate(
+      const name = await page.$eval(
+        'h1.product-title',
         (el) => el.textContent!,
       );
 
-      const score = await (await page.$(
-        PRODUCT.DETAIL.SCORE.SELECTOR,
-      ))!.evaluate(
-        (el) => el.parentElement!.textContent!.split(/SCA SCORE\s/)[1],
+      const score = Number(
+        await page.$eval(
+          'text/SCA SCORE',
+          (el) => el.parentElement!.textContent!.split(/SCA SCORE\s/)[1],
+        ),
       );
 
       await page.close();
