@@ -3,11 +3,11 @@ import { mapAsync, wait } from '../utils/async.js';
 import { limit } from '../utils/semaphore.js';
 import currency from 'currency.js';
 import { Coffee } from '../models/coffee.js';
-import { CoffeeShop } from '../models/coffee-shop.js';
+import { CoffeeShopLegacy } from '../models/coffee-shop.js';
 
 const DOMAIN = 'https://www.passengercoffee.com';
 
-export class Passenger implements CoffeeShop {
+export class Passenger implements CoffeeShopLegacy {
   async getUrls(page: Page) {
     await page.goto(`${DOMAIN}/collections/coffee`);
 

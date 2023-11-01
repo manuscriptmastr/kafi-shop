@@ -3,11 +3,11 @@ import { mapAsync } from '../utils/async.js';
 import { limit } from '../utils/semaphore.js';
 import currency from 'currency.js';
 import { Coffee } from '../models/coffee.js';
-import { CoffeeShop } from '../models/coffee-shop.js';
+import { CoffeeShopLegacy } from '../models/coffee-shop.js';
 
 const DOMAIN = 'https://onyxcoffeelab.com';
 
-export class Onyx implements CoffeeShop {
+export class Onyx implements CoffeeShopLegacy {
   async getUrls(page: Page) {
     await page.goto(`${DOMAIN}/collections/coffee`);
 

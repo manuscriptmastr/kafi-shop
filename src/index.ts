@@ -3,17 +3,10 @@ import { CoffeaCirculor } from './shops/coffea-circulor.js';
 import { Manhattan } from './shops/manhattan.js';
 import { Onyx } from './shops/onyx.js';
 import { Passenger } from './shops/passenger.js';
-import { CoffeeShop } from './models/coffee-shop.js';
+import { CoffeeShopEnum } from './models/coffee-shop.js';
 
-enum CoffeeShopEnum {
-  CoffeaCirculor = 'coffea-circulor',
-  Manhattan = 'manhattan',
-  Onyx = 'onyx',
-  Passenger = 'passenger',
-}
-
-const SHOPS: { [K in CoffeeShopEnum]: CoffeeShop } = {
-  [CoffeeShopEnum.CoffeaCirculor]: new CoffeaCirculor(),
+const SHOPS = {
+  [CoffeaCirculor.id]: new CoffeaCirculor(),
   [CoffeeShopEnum.Manhattan]: new Manhattan(),
   [CoffeeShopEnum.Onyx]: new Onyx(),
   [CoffeeShopEnum.Passenger]: new Passenger(),
