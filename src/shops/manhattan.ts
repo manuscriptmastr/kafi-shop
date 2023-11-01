@@ -1,13 +1,10 @@
-import puppeteer, { Page } from 'puppeteer';
-import { limit } from '../utils/semaphore.js';
 import currency from 'currency.js';
-import { mapAsync } from '../utils/async.js';
-import { Coffee } from '../models/coffee.js';
-import { CoffeeShopLegacy } from '../models/coffee-shop.js';
+import { Page } from 'puppeteer';
+import { CoffeeShop, CoffeeShopProperties } from '../models/coffee-shop.js';
 
 const DOMAIN = 'https://manhattancoffeeroasters.com';
 
-export class Manhattan implements CoffeeShopLegacy {
+export class Manhattan extends CoffeeShop implements CoffeeShopProperties {
   async getUrls(page: Page) {
     await page.goto(`${DOMAIN}/catalog/coffee`);
 
@@ -17,59 +14,43 @@ export class Manhattan implements CoffeeShopLegacy {
     );
   }
 
-  async getProducts() {
-    const browser = await puppeteer.launch({ headless: 'new' });
-    const page = await browser.newPage();
+  async shouldSkipProductPage(page: Page) {
+    return !(await page.$('button::-p-text(Filter)'));
+  }
 
-    const urls = await this.getUrls(page);
+  async setupProductPage(page: Page) {
+    const filterButton = (await page.$('button::-p-text(Filter)'))!;
+    await filterButton.click();
+  }
 
-    const unfilteredProducts: Coffee[] = await mapAsync(
-      urls,
-      limit(10, async (url: string): Promise<Coffee | null> => {
-        const page = await browser.newPage();
-        await page.goto(url);
-
-        const filterButton = await page.$('button::-p-text(Filter)');
-
-        if (!filterButton) {
-          page.close();
-          return null;
-        }
-
-        await filterButton.click();
-
-        const priceText = await page.$eval(
-          '::-p-text(250 gram whole coffee beans)',
-          (el) =>
-            el.parentElement!.nextElementSibling!.firstElementChild!.textContent!.trim(),
-        );
-
-        const price = currency(priceText, {
-          symbol: '',
-          decimal: ',',
-        }).value;
-
-        const name = await page.$eval('h1', (h1) => h1.textContent!.trim());
-
-        const flavors = await page.$eval('::-p-text(tastes like)', (el) =>
-          Array.from(
-            el.parentElement!.parentElement!.querySelectorAll(
-              'li.overflow-hidden',
-            ),
-          )
-            .map((el) => el.firstElementChild!.textContent!.trim())
-            .join(', '),
-        );
-
-        await page.close();
-        return { name, flavors, price, score: 'N/A', url };
-      }),
+  async getPrice(page: Page) {
+    const priceText = await page.$eval(
+      '::-p-text(250 gram whole coffee beans)',
+      (el) =>
+        el.parentElement!.nextElementSibling!.firstElementChild!.textContent!.trim(),
     );
 
-    const products = unfilteredProducts
-      .filter((p) => p)
-      .sort((a, b) => a.price - b.price);
-    await browser.close();
-    return products;
+    return currency(priceText, {
+      symbol: '',
+      decimal: ',',
+    }).value;
+  }
+
+  async getName(page: Page) {
+    return page.$eval('h1', (h1) => h1.textContent!.trim());
+  }
+
+  async getTastingNotes(page: Page) {
+    return page.$eval('::-p-text(tastes like)', (el) =>
+      Array.from(
+        el.parentElement!.parentElement!.querySelectorAll('li.overflow-hidden'),
+      )
+        .map((el) => el.firstElementChild!.textContent!.trim())
+        .join(', '),
+    );
+  }
+
+  async getCuppingScore(page: Page): Promise<'N/A'> {
+    return 'N/A';
   }
 }

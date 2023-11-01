@@ -1,12 +1,14 @@
-import puppeteer, { Page } from 'puppeteer';
-import { limit } from '../utils/semaphore.js';
-import { mapAsync, wait } from '../utils/async.js';
-import { Coffee } from '../models/coffee.js';
-import { CoffeeShopEnum, CoffeeShop } from '../models/coffee-shop.js';
+import { Page } from 'puppeteer';
+import {
+  CoffeeShop,
+  CoffeeShopEnum,
+  CoffeeShopProperties,
+} from '../models/coffee-shop.js';
+import { wait } from '../utils/async.js';
 
 const DOMAIN = 'https://coffeacirculor.com';
 
-export class CoffeaCirculor implements CoffeeShop {
+export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
   static id = CoffeeShopEnum.CoffeaCirculor;
 
   async getUrls(page: Page) {
@@ -46,7 +48,7 @@ export class CoffeaCirculor implements CoffeeShop {
     );
   }
 
-  async shouldSkipProduct(page: Page) {
+  async shouldSkipProductPage(page: Page) {
     const sizes = await page.$$('[data-text^="250g"] span');
 
     const prices = [];
@@ -92,43 +94,5 @@ export class CoffeaCirculor implements CoffeeShop {
     }
 
     return Math.min(...prices);
-  }
-
-  async getProducts() {
-    const browser = await puppeteer.launch({ headless: 'new' });
-    const page = await browser.newPage();
-
-    const urls = await this.getUrls(page);
-    await page.close();
-
-    const unfilteredProducts: Coffee[] = await mapAsync(
-      urls.slice(0, 10),
-      limit(10, async (url: string): Promise<Coffee | null> => {
-        const page = await browser.newPage();
-        await page.goto(url);
-
-        if (await this.shouldSkipProduct(page)) {
-          await page.close();
-          return null;
-        }
-
-        const [name, flavors, price, score] = await Promise.all([
-          this.getName(page),
-          this.getTastingNotes(page),
-          this.getPrice(page),
-          this.getCuppingScore(page),
-        ]);
-
-        await page.close();
-
-        return { name, flavors, price, score, url };
-      }),
-    );
-
-    const products = unfilteredProducts
-      .filter((p) => p)
-      .sort((a, b) => a.price - b.price);
-    await browser.close();
-    return products;
   }
 }
