@@ -99,9 +99,10 @@ export class CoffeaCirculor implements CoffeeShop {
     const page = await browser.newPage();
 
     const urls = await this.getUrls(page);
+    await page.close();
 
     const unfilteredProducts: Coffee[] = await mapAsync(
-      urls,
+      urls.slice(0, 10),
       limit(10, async (url: string): Promise<Coffee | null> => {
         const page = await browser.newPage();
         await page.goto(url);
@@ -126,8 +127,7 @@ export class CoffeaCirculor implements CoffeeShop {
 
     const products = unfilteredProducts
       .filter((p) => p)
-      .sort((a, b) => a.price - b.price)
-      .filter(({ price }) => price <= 20);
+      .sort((a, b) => a.price - b.price);
     await browser.close();
     return products;
   }
