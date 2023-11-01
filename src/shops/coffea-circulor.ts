@@ -1,6 +1,6 @@
+import { CoffeeShop, CoffeeShopProperties } from '@models/coffee.js';
+import { wait } from '@utils/async.js';
 import { Page } from 'puppeteer';
-import { CoffeeShop, CoffeeShopProperties } from '../models/coffee.js';
-import { wait } from '../utils/async.js';
 
 const DOMAIN = 'https://coffeacirculor.com';
 

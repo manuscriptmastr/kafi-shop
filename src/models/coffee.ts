@@ -1,6 +1,6 @@
+import { mapAsync } from '@utils/async.js';
+import { limit } from '@utils/semaphore.js';
 import puppeteer, { Page } from 'puppeteer';
-import { mapAsync } from '../utils/async.js';
-import { limit } from '../utils/semaphore.js';
 
 export interface Coffee {
   cuppingScore: number | 'N/A';

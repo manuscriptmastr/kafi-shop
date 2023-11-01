@@ -4,7 +4,13 @@
     "outDir": "dist",
     "module": "NodeNext",
     "target": "ESNext",
-    "strict": true
+    "strict": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@models/*": ["models/*"],
+      "@shops/*": ["shops/*"],
+      "@utils/*": ["utils/*"]
+    }
   },
   "include": ["**/*.ts"]
 }

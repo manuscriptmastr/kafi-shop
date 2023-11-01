@@ -1,9 +1,10 @@
+// organize-imports-ignore
 import 'dotenv/config';
-import { CoffeeShopEnum } from './models/coffee.js';
-import { CoffeaCirculor } from './shops/coffea-circulor.js';
-import { Manhattan } from './shops/manhattan.js';
-import { Onyx } from './shops/onyx.js';
-import { Passenger } from './shops/passenger.js';
+import { CoffeeShopEnum } from '@models/coffee.js';
+import { CoffeaCirculor } from '@shops/coffea-circulor.js';
+import { Manhattan } from '@shops/manhattan.js';
+import { Onyx } from '@shops/onyx.js';
+import { Passenger } from '@shops/passenger.js';
 
 const SHOPS = {
   [CoffeeShopEnum.CoffeaCirculor]: new CoffeaCirculor(),
