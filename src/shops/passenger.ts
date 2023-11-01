@@ -1,9 +1,9 @@
+import currency from 'currency.js';
 import puppeteer, { Page } from 'puppeteer';
+import { CoffeeShopLegacy } from '../models/coffee-shop.js';
+import { Coffee } from '../models/coffee.js';
 import { mapAsync, wait } from '../utils/async.js';
 import { limit } from '../utils/semaphore.js';
-import currency from 'currency.js';
-import { Coffee } from '../models/coffee.js';
-import { CoffeeShopLegacy } from '../models/coffee-shop.js';
 
 const DOMAIN = 'https://www.passengercoffee.com';
 

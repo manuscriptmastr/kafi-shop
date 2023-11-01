@@ -1,16 +1,10 @@
 import { Page } from 'puppeteer';
-import {
-  CoffeeShop,
-  CoffeeShopEnum,
-  CoffeeShopProperties,
-} from '../models/coffee-shop.js';
+import { CoffeeShop, CoffeeShopProperties } from '../models/coffee-shop.js';
 import { wait } from '../utils/async.js';
 
 const DOMAIN = 'https://coffeacirculor.com';
 
 export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
-  static id = CoffeeShopEnum.CoffeaCirculor;
-
   async getUrls(page: Page) {
     await page.goto(`${DOMAIN}/collections/all`);
 

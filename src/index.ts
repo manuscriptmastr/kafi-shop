@@ -1,12 +1,12 @@
 import 'dotenv/config';
+import { CoffeeShopEnum } from './models/coffee-shop.js';
 import { CoffeaCirculor } from './shops/coffea-circulor.js';
 import { Manhattan } from './shops/manhattan.js';
 import { Onyx } from './shops/onyx.js';
 import { Passenger } from './shops/passenger.js';
-import { CoffeeShopEnum } from './models/coffee-shop.js';
 
 const SHOPS = {
-  [CoffeaCirculor.id]: new CoffeaCirculor(),
+  [CoffeeShopEnum.CoffeaCirculor]: new CoffeaCirculor(),
   [CoffeeShopEnum.Manhattan]: new Manhattan(),
   [CoffeeShopEnum.Onyx]: new Onyx(),
   [CoffeeShopEnum.Passenger]: new Passenger(),
