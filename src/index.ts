@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { CoffeeShopEnum } from './models/coffee-shop.js';
+import { CoffeeShopEnum } from './models/coffee.js';
 import { CoffeaCirculor } from './shops/coffea-circulor.js';
 import { Manhattan } from './shops/manhattan.js';
 import { Onyx } from './shops/onyx.js';

@@ -1,6 +1,6 @@
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
-import { CoffeeShop, CoffeeShopProperties } from '../models/coffee-shop.js';
+import { CoffeeShop, CoffeeShopProperties } from '../models/coffee.js';
 
 const DOMAIN = 'https://onyxcoffeelab.com';
 
