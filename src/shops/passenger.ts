@@ -1,13 +1,11 @@
 import currency from 'currency.js';
-import puppeteer, { Page } from 'puppeteer';
-import { CoffeeShopLegacy } from '../models/coffee-shop.js';
-import { Coffee } from '../models/coffee.js';
-import { mapAsync, wait } from '../utils/async.js';
-import { limit } from '../utils/semaphore.js';
+import { Page } from 'puppeteer';
+import { CoffeeShop, CoffeeShopProperties } from '../models/coffee-shop.js';
+import { wait } from '../utils/async.js';
 
 const DOMAIN = 'https://www.passengercoffee.com';
 
-export class Passenger implements CoffeeShopLegacy {
+export class Passenger extends CoffeeShop implements CoffeeShopProperties {
   async getUrls(page: Page) {
     await page.goto(`${DOMAIN}/collections/coffee`);
 
@@ -24,65 +22,55 @@ export class Passenger implements CoffeeShopLegacy {
     );
   }
 
-  async getProducts() {
-    const browser = await puppeteer.launch({ headless: 'new' });
-    const page = await browser.newPage();
-
-    const urls = await this.getUrls(page);
-
-    const unfilteredProducts: Coffee[] = await mapAsync(
-      urls,
-      limit(10, async (url: string): Promise<Coffee | null> => {
-        const page = await browser.newPage();
-        await page.goto(url);
-
-        const size = await page.$(
-          'label.swatch:has(input[name="Size"][value="10 oz"])',
-        );
-
-        if (!size) {
-          page.close();
-          return null;
-        }
-
-        await size.click();
-
-        const isAddToCartDisabled = await page.$eval(
-          'button[type=submit][name=add]',
-          (button) => button.disabled,
-        );
-
-        if (isAddToCartDisabled) {
-          page.close();
-          return null;
-        }
-
-        const priceText = await page.$eval(
-          '.product-top--details .product-top--details-price span[data-product-price]',
-          (span) => span.textContent!.trim(),
-        );
-
-        const price = currency(priceText).value;
-
-        const name = await page.$eval(
-          '.product-top--details .product-label--title h2 span',
-          (span) => span.textContent!.trim(),
-        );
-
-        const flavors = await page.$$eval(
-          '.product-top--details .product-label--notes ul li',
-          (lis) => lis.map((li) => li.textContent!.trim()).join(', '),
-        );
-
-        await page.close();
-        return { name, flavors, price, score: 'N/A', url };
-      }),
+  async shouldSkipProductPage(page: Page) {
+    const size = await page.$(
+      'label.swatch:has(input[name="Size"][value="10 oz"])',
     );
 
-    const products = unfilteredProducts
-      .filter((p) => p)
-      .sort((a, b) => a.price - b.price);
-    await browser.close();
-    return products;
+    if (!size) {
+      return true;
+    }
+
+    await size.click();
+
+    const isAddToCartDisabled = await page.$eval(
+      'button[type=submit][name=add]',
+      (button) => button.disabled,
+    );
+
+    if (isAddToCartDisabled) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async getPrice(page: Page) {
+    await page.$('label.swatch:has(input[name="Size"][value="10 oz"])');
+
+    const priceText = await page.$eval(
+      '.product-top--details .product-top--details-price span[data-product-price]',
+      (span) => span.textContent!.trim(),
+    );
+
+    return currency(priceText).value;
+  }
+
+  async getName(page: Page) {
+    return page.$eval(
+      '.product-top--details .product-label--title h2 span',
+      (span) => span.textContent!.trim(),
+    );
+  }
+
+  async getTastingNotes(page: Page) {
+    return page.$$eval(
+      '.product-top--details .product-label--notes ul li',
+      (lis) => lis.map((li) => li.textContent!.trim()).join(', '),
+    );
+  }
+
+  async getCuppingScore(page: Page): Promise<'N/A'> {
+    return 'N/A';
   }
 }
