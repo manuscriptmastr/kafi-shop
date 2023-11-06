@@ -10,12 +10,18 @@ export interface Coffee {
   url: string;
 }
 
+export interface CoffeeError {
+  error: string;
+  price: 0;
+  url: string;
+}
+
 export interface CoffeeShopProperties {
   getTastingNotes: (page: Page) => Promise<string>;
   getName: (page: Page) => Promise<string>;
   getCuppingScore: (page: Page) => Promise<Number | 'N/A'>;
   getPrice: (page: Page) => Promise<Number>;
-  getProducts: () => Promise<Coffee[]>;
+  getProducts: () => Promise<(Coffee | CoffeeError)[]>;
   getUrls: (page: Page) => Promise<string[]>;
   setupProductPage?: (page: Page) => Promise<void>;
   shouldSkipProductPage: (page: Page) => Promise<boolean>;
@@ -39,34 +45,39 @@ export class CoffeeShop {
 
     const unfilteredProducts: Coffee[] = await mapAsync(
       urls,
-      limit(10, async (url: string): Promise<Coffee | null> => {
-        const page = await browser.newPage();
-        await page.goto(url);
+      limit(10, async (url: string): Promise<Coffee | CoffeeError | null> => {
+        try {
+          const page = await browser.newPage();
+          await page.goto(url);
 
-        // @ts-ignore
-        if (await this.shouldSkipProductPage(page)) {
-          page.close();
-          return null;
+          // @ts-ignore
+          if (await this.shouldSkipProductPage(page)) {
+            page.close();
+            return null;
+          }
+
+          if (this.hasOwnProperty('setupProductPage')) {
+            // @ts-ignore
+            await this.setupProductPage(page);
+          }
+
+          const [name, tastingNotes, price, cuppingScore] = await Promise.all([
+            // @ts-ignore
+            this.getName(page),
+            // @ts-ignore
+            this.getTastingNotes(page),
+            // @ts-ignore
+            this.getPrice(page),
+            // @ts-ignore
+            this.getCuppingScore(page),
+          ]);
+
+          await page.close();
+          return { name, tastingNotes, price, cuppingScore, url };
+        } catch (e) {
+          await page.close();
+          return { error: e!.toString(), price: 0, url };
         }
-
-        if (this.hasOwnProperty('setupProductPage')) {
-          // @ts-ignore
-          await this.setupProductPage(page);
-        }
-
-        const [name, tastingNotes, price, cuppingScore] = await Promise.all([
-          // @ts-ignore
-          this.getName(page),
-          // @ts-ignore
-          this.getTastingNotes(page),
-          // @ts-ignore
-          this.getPrice(page),
-          // @ts-ignore
-          this.getCuppingScore(page),
-        ]);
-
-        await page.close();
-        return { name, tastingNotes, price, cuppingScore, url };
       }),
     );
 
