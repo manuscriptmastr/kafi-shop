@@ -15,26 +15,25 @@ export const newsFeedTemplate = (
   ) as Coffee[];
 
   return `
-*${shop} Coffees of the Day*
+*${shop}*
+_Note: prices reflect 250g size._
 
-*Low prices (< $15)*
+*Low (< $15)*
 ${coffees
   .filter(({ price }) => price < 15)
   .map(({ name, tastingNotes, url }) => `- [${name}](${url}): ${tastingNotes}`)
   .join('\n')}
 
-*Mid prices ($15–$25)*
+*Mid ($15–$25)*
 ${coffees
-  .filter(({ price }) => price >= 15 && price <= 25)
+  .filter(({ price }) => price >= 15 && price < 25)
   .map(({ name, tastingNotes, url }) => `- [${name}](${url}): ${tastingNotes}`)
   .join('\n')}
 
 *Feelin' bougie?*
 ${coffees
-  .filter(({ price }) => price > 25 && price <= 30)
+  .filter(({ price }) => price >= 25 && price <= 30)
   .map(({ name, tastingNotes, url }) => `- [${name}](${url}): ${tastingNotes}`)
   .join('\n')}
-
-Note: *Free international shipping when you buy 1kg!*
 	`;
 };
