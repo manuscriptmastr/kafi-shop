@@ -5,6 +5,7 @@ import { CoffeaCirculor } from '@shops/coffea-circulor.js';
 import { Manhattan } from '@shops/manhattan.js';
 import { Onyx } from '@shops/onyx.js';
 import { Passenger } from '@shops/passenger.js';
+import { newsFeedTemplate } from 'templates.js';
 
 const SHOPS: { [K in CoffeeShopEnum]: CoffeeShopProperties } = {
   [CoffeeShopEnum.CoffeaCirculor]: new CoffeaCirculor(),
@@ -28,4 +29,4 @@ if (!Object.values(CoffeeShopEnum).includes(shop)) {
 
 const products = await SHOPS[shop].getProducts();
 
-console.log(products);
+console.log(newsFeedTemplate(shop, products));

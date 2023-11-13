@@ -34,6 +34,17 @@ export enum CoffeeShopEnum {
   Passenger = 'passenger',
 }
 
+export const getCoffeeShopName = (shop: CoffeeShopEnum) => {
+  const coffeeShopNames: { [key in CoffeeShopEnum]: string } = {
+    [CoffeeShopEnum.CoffeaCirculor]: 'Coffea Circulor',
+    [CoffeeShopEnum.Manhattan]: 'Manhattan Coffee Roasters',
+    [CoffeeShopEnum.Onyx]: 'Onyx Coffee Lab',
+    [CoffeeShopEnum.Passenger]: 'Passenger Coffee',
+  };
+
+  return coffeeShopNames[shop];
+};
+
 export class CoffeeShop {
   async getProducts() {
     const browser = await puppeteer.launch({ headless: 'new' });
