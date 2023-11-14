@@ -36,9 +36,8 @@ export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getTastingNotes(page: Page) {
-    return page.$eval(
-      'text/Flavor',
-      (el) => el.nextElementSibling!.textContent!,
+    return page.$eval('text/Flavor', (el) =>
+      el.nextElementSibling!.textContent!.trim().split(/,\s/),
     );
   }
 

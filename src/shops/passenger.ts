@@ -66,7 +66,7 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
   async getTastingNotes(page: Page) {
     return page.$$eval(
       '.product-top--details .product-label--notes ul li',
-      (lis) => lis.map((li) => li.textContent!.trim()).join(', '),
+      (lis) => lis.map((li) => li.textContent!.trim()),
     );
   }
 

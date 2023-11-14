@@ -6,7 +6,7 @@ export interface Coffee {
   cuppingScore: number | 'N/A';
   name: string;
   price: number;
-  tastingNotes: string;
+  tastingNotes: string[];
   url: string;
 }
 
@@ -17,7 +17,7 @@ export interface CoffeeError {
 }
 
 export interface CoffeeShopProperties {
-  getTastingNotes: (page: Page) => Promise<string>;
+  getTastingNotes: (page: Page) => Promise<string[]>;
   getName: (page: Page) => Promise<string>;
   getCuppingScore: (page: Page) => Promise<Number | 'N/A'>;
   getPrice: (page: Page) => Promise<Number>;

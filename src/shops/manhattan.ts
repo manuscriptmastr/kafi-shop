@@ -44,9 +44,7 @@ export class Manhattan extends CoffeeShop implements CoffeeShopProperties {
     return page.$eval('::-p-text(tastes like)', (el) =>
       Array.from(
         el.parentElement!.parentElement!.querySelectorAll('li.overflow-hidden'),
-      )
-        .map((el) => el.firstElementChild!.textContent!.trim())
-        .join(', '),
+      ).map((el) => el.firstElementChild!.textContent!.trim()),
     );
   }
 

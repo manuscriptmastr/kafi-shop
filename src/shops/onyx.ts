@@ -44,7 +44,7 @@ export class Onyx extends CoffeeShop implements CoffeeShopProperties {
   async getTastingNotes(page: Page) {
     return page.$eval(
       'div.image-features div.label::-p-text(Cup:) + div.value',
-      (div) => div.textContent!.trim(),
+      (div) => div.textContent!.trim().split(/,\s/),
     );
   }
 }
