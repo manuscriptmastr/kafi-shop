@@ -30,5 +30,5 @@ if (!Object.values(CoffeeShopEnum).includes(shop)) {
 }
 
 const products = await SHOPS[shop].getProducts();
+
 console.log(products);
-// console.log(newsFeedTemplate(shop, products));
