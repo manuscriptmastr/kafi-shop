@@ -1,11 +1,45 @@
 import { CoffeeShop, CoffeeShopProperties } from '@models/coffee.js';
 import { wait } from '@utils/async.js';
+import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
 const DOMAIN = 'https://www.passengercoffee.com';
 
 export class Passenger extends CoffeeShop implements CoffeeShopProperties {
+  async getCountry(page: Page) {
+    const country = await page.$eval(
+      '.product-top--details .product-label--region',
+      (dd) => dd.textContent!.trim(),
+    );
+    return capitalize(country);
+  }
+
+  async getName(page: Page) {
+    return page.$eval(
+      '.product-top--details .product-label--title h2 span',
+      (span) => span.textContent!.trim(),
+    );
+  }
+
+  async getPrice(page: Page) {
+    await page.$('label.swatch:has(input[name="Size"][value="10 oz"])');
+
+    const priceText = await page.$eval(
+      '.product-top--details .product-top--details-price span[data-product-price]',
+      (span) => span.textContent!.trim(),
+    );
+
+    return currency(priceText).value;
+  }
+
+  async getTastingNotes(page: Page) {
+    return page.$$eval(
+      '.product-top--details .product-label--notes ul li',
+      (lis) => lis.map((li) => li.textContent!.trim()),
+    );
+  }
+
   async getUrls(page: Page) {
     await page.goto(`${DOMAIN}/collections/coffee`);
 
@@ -43,30 +77,5 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
     }
 
     return false;
-  }
-
-  async getPrice(page: Page) {
-    await page.$('label.swatch:has(input[name="Size"][value="10 oz"])');
-
-    const priceText = await page.$eval(
-      '.product-top--details .product-top--details-price span[data-product-price]',
-      (span) => span.textContent!.trim(),
-    );
-
-    return currency(priceText).value;
-  }
-
-  async getName(page: Page) {
-    return page.$eval(
-      '.product-top--details .product-label--title h2 span',
-      (span) => span.textContent!.trim(),
-    );
-  }
-
-  async getTastingNotes(page: Page) {
-    return page.$$eval(
-      '.product-top--details .product-label--notes ul li',
-      (lis) => lis.map((li) => li.textContent!.trim()),
-    );
   }
 }
