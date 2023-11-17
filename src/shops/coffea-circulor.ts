@@ -41,6 +41,12 @@ export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
     );
   }
 
+  async getCountry(page: Page) {
+    return page.$eval('text/Country', (el) =>
+      el.nextElementSibling!.textContent!.trim(),
+    );
+  }
+
   async shouldSkipProductPage(page: Page) {
     const sizes = await page.$$('[data-text^="250g"] span');
 
