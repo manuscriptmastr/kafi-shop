@@ -11,7 +11,7 @@ export const newsFeedTemplate = (
 ) => {
   const shop = getCoffeeShopName(coffeeShop);
   const coffees = coffeesOrErrors.filter(
-    (coffee) => !coffee.hasOwnProperty('error'),
+    (coffee) => !('error' in coffee),
   ) as Coffee[];
 
   return `

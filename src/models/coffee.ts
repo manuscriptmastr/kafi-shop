@@ -3,6 +3,7 @@ import { limit } from '@utils/semaphore.js';
 import puppeteer, { Page } from 'puppeteer';
 
 export interface Coffee {
+  country: string | 'N/A';
   cuppingScore: number | 'N/A';
   name: string;
   price: number;
@@ -19,6 +20,7 @@ export interface CoffeeError {
 export interface CoffeeShopProperties {
   getTastingNotes: (page: Page) => Promise<string[]>;
   getName: (page: Page) => Promise<string>;
+  getCountry?: (page: Page) => Promise<string>;
   getCuppingScore?: (page: Page) => Promise<Number>;
   getPrice: (page: Page) => Promise<Number>;
   getProducts: () => Promise<(Coffee | CoffeeError)[]>;
@@ -69,26 +71,31 @@ export class CoffeeShop {
             return null;
           }
 
-          if (this.hasOwnProperty('setupProductPage')) {
+          if ('setupProductPage' in this) {
             // @ts-ignore
             await this.setupProductPage(page);
           }
 
-          const [name, tastingNotes, price, cuppingScore] = await Promise.all([
-            // @ts-ignore
-            this.getName(page),
-            // @ts-ignore
-            this.getTastingNotes(page),
-            // @ts-ignore
-            this.getPrice(page),
-            this.hasOwnProperty('getCuppingScore')
-              ? // @ts-ignore
-                this.getCuppingScore(page)
-              : 'N/A',
-          ]);
+          const [name, country, tastingNotes, price, cuppingScore] =
+            await Promise.all([
+              // @ts-ignore
+              this.getName(page),
+              'getCountry' in this
+                ? // @ts-ignore
+                  this.getCountry(page)
+                : 'N/A',
+              // @ts-ignore
+              this.getTastingNotes(page),
+              // @ts-ignore
+              this.getPrice(page),
+              'getCuppingScore' in this
+                ? // @ts-ignore
+                  this.getCuppingScore(page)
+                : 'N/A',
+            ]);
 
           await page.close();
-          return { name, tastingNotes, price, cuppingScore, url };
+          return { name, country, tastingNotes, price, cuppingScore, url };
         } catch (e) {
           await page.close();
           return { error: e!.toString(), price: 0, url };

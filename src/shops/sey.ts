@@ -5,6 +5,12 @@ import { Page } from 'puppeteer';
 const DOMAIN = 'https://www.seycoffee.com';
 
 export class Sey extends CoffeeShop implements CoffeeShopProperties {
+  async getCountry(page: Page) {
+    return page.$eval('span.coffeeTitle_country', (span: HTMLSpanElement) =>
+      span.textContent!.trim(),
+    );
+  }
+
   async getTastingNotes(page: Page) {
     const description = await page.$$eval(
       'div.coffee_keyInfo_shortBlurb *',
