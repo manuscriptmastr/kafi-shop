@@ -32,6 +32,7 @@ export enum CoffeeShopEnum {
   Manhattan = 'manhattan',
   Onyx = 'onyx',
   Passenger = 'passenger',
+  Sey = 'sey',
 }
 
 export const getCoffeeShopName = (shop: CoffeeShopEnum) => {
@@ -40,6 +41,7 @@ export const getCoffeeShopName = (shop: CoffeeShopEnum) => {
     [CoffeeShopEnum.Manhattan]: 'Manhattan Coffee Roasters',
     [CoffeeShopEnum.Onyx]: 'Onyx Coffee Lab',
     [CoffeeShopEnum.Passenger]: 'Passenger Coffee',
+    [CoffeeShopEnum.Sey]: 'Sey',
   };
 
   return coffeeShopNames[shop];
