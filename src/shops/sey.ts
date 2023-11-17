@@ -30,10 +30,6 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
     );
   }
 
-  async getCuppingScore(page: Page) {
-    return 'N/A' as const;
-  }
-
   async getPrice(page: Page) {
     const priceString = await page.$eval(
       'option::-p-text(250g)',

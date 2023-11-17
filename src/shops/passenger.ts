@@ -69,8 +69,4 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
       (lis) => lis.map((li) => li.textContent!.trim()),
     );
   }
-
-  async getCuppingScore(page: Page) {
-    return 'N/A' as const;
-  }
 }

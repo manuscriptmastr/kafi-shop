@@ -47,8 +47,4 @@ export class Manhattan extends CoffeeShop implements CoffeeShopProperties {
       ).map((el) => el.firstElementChild!.textContent!.trim()),
     );
   }
-
-  async getCuppingScore(page: Page) {
-    return 'N/A' as const;
-  }
 }

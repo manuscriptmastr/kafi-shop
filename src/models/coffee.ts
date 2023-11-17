@@ -19,7 +19,7 @@ export interface CoffeeError {
 export interface CoffeeShopProperties {
   getTastingNotes: (page: Page) => Promise<string[]>;
   getName: (page: Page) => Promise<string>;
-  getCuppingScore: (page: Page) => Promise<Number | 'N/A'>;
+  getCuppingScore?: (page: Page) => Promise<Number>;
   getPrice: (page: Page) => Promise<Number>;
   getProducts: () => Promise<(Coffee | CoffeeError)[]>;
   getUrls: (page: Page) => Promise<string[]>;
@@ -81,8 +81,10 @@ export class CoffeeShop {
             this.getTastingNotes(page),
             // @ts-ignore
             this.getPrice(page),
-            // @ts-ignore
-            this.getCuppingScore(page),
+            this.hasOwnProperty('getCuppingScore')
+              ? // @ts-ignore
+                this.getCuppingScore(page)
+              : 'N/A',
           ]);
 
           await page.close();
