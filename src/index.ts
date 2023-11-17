@@ -5,7 +5,6 @@ import { CoffeaCirculor } from '@shops/coffea-circulor.js';
 import { Manhattan } from '@shops/manhattan.js';
 import { Onyx } from '@shops/onyx.js';
 import { Passenger } from '@shops/passenger.js';
-import { newsFeedTemplate } from 'templates.js';
 import { Sey } from '@shops/sey.js';
 
 const SHOPS: { [K in CoffeeShopEnum]: CoffeeShopProperties } = {
