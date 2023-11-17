@@ -11,6 +11,22 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
     );
   }
 
+  async getName(page: Page) {
+    return page.$eval(
+      'span.coffeeTitle_producer',
+      (span: HTMLSpanElement) => span.textContent!,
+    );
+  }
+
+  async getPrice(page: Page) {
+    const priceString = await page.$eval(
+      'option::-p-text(250g)',
+      (option: HTMLOptionElement) =>
+        option.textContent!.trim().split(' - ')[1]!,
+    );
+    return currency(priceString).value;
+  }
+
   async getTastingNotes(page: Page) {
     const description = await page.$$eval(
       'div.coffee_keyInfo_shortBlurb *',
@@ -27,22 +43,6 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
     const [_, lastSentence] = description.split('.').reverse();
 
     return [`${lastSentence.trim()}.`];
-  }
-
-  async getName(page: Page) {
-    return page.$eval(
-      'span.coffeeTitle_producer',
-      (span: HTMLSpanElement) => span.textContent!,
-    );
-  }
-
-  async getPrice(page: Page) {
-    const priceString = await page.$eval(
-      'option::-p-text(250g)',
-      (option: HTMLOptionElement) =>
-        option.textContent!.trim().split(' - ')[1]!,
-    );
-    return currency(priceString).value;
   }
 
   async getUrls(page: Page) {
