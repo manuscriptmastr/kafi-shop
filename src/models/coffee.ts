@@ -21,6 +21,10 @@ export interface Metadata {
   size: Size;
 }
 
+/**
+ * @todo Rephrase sizes as Partial<Record<Size, string>>, then tighten types per coffee shop
+ * @todo Use static properties for url, name, buyingTip, and sizes
+ */
 export interface CoffeeShopProperties {
   url: string;
   name: string;
