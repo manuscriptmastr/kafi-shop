@@ -1,14 +1,27 @@
-import { CoffeeShop, CoffeeShopProperties } from '@models/coffee.js';
+import {
+  CoffeeShop,
+  CoffeeShopProperties,
+  Metadata,
+  Size,
+} from '@models/coffee.js';
 import { wait } from '@utils/async.js';
 import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
+
+const sizeMappings: Partial<Record<Size, string>> = {
+  [Size.FiveOunces]: '5 oz',
+  [Size.TenOunces]: '10 oz',
+  [Size.TwoPounds]: '2 lbs',
+  [Size.FivePounds]: '5 lbs',
+};
 
 export class Passenger extends CoffeeShop implements CoffeeShopProperties {
   url = 'https://www.passengercoffee.com';
   name = 'Passenger Coffee';
   buyingTip =
     'Free shipping on orders of $50 or more. Also, consider buying larger bags to drastically reduce overall costs.';
+  sizes = [Size.FiveOunces, Size.TenOunces, Size.TwoPounds, Size.FivePounds];
 
   async getCountry(page: Page) {
     const country = await page.$eval(
@@ -25,8 +38,10 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
     );
   }
 
-  async getPrice(page: Page) {
-    await page.$('label.swatch:has(input[name="Size"][value="10 oz"])');
+  async getPrice(page: Page, { size }: Metadata) {
+    await page.$(
+      `label.swatch:has(input[name="Size"][value="${sizeMappings[size]}"])`,
+    );
 
     const priceText = await page.$eval(
       '.product-top--details .product-top--details-price span[data-product-price]',
@@ -59,16 +74,16 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
     );
   }
 
-  async shouldSkipProductPage(page: Page) {
-    const size = await page.$(
-      'label.swatch:has(input[name="Size"][value="10 oz"])',
+  async shouldSkipProductPage(page: Page, { size }: Metadata) {
+    const option = await page.$(
+      `label.swatch:has(input[name="Size"][value="${sizeMappings[size]}"])`,
     );
 
-    if (!size) {
+    if (!option) {
       return true;
     }
 
-    await size.click();
+    await option.click();
 
     const isAddToCartDisabled = await page.$eval(
       'button[type=submit][name=add]',

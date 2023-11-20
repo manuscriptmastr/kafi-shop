@@ -1,9 +1,15 @@
-import { Coffee, CoffeeError, CoffeeShopProperties } from '@models/coffee.js';
+import {
+  Coffee,
+  CoffeeError,
+  CoffeeShopProperties,
+  Metadata,
+} from '@models/coffee.js';
 import currency from 'currency.js';
 
 export const newsFeedTemplate = (
   coffeeShop: CoffeeShopProperties,
   coffeesOrErrors: (Coffee | CoffeeError)[],
+  metadata: Metadata,
 ) => {
   const coffees = coffeesOrErrors.filter(
     (coffee) => !('error' in coffee),
@@ -23,7 +29,7 @@ export const newsFeedTemplate = (
 
   return `
 *[${coffeeShop.name}](${coffeeShop.url})*
-_Note: Prices reflect 250g size._
+_Note: Prices reflect ${metadata.size} size._
 
 *Low (< $15)*
 ${coffeesToList(coffees.filter(({ price }) => price < 15))}

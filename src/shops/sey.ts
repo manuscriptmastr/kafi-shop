@@ -1,4 +1,9 @@
-import { CoffeeShop, CoffeeShopProperties } from '@models/coffee.js';
+import {
+  CoffeeShop,
+  CoffeeShopProperties,
+  Metadata,
+  Size,
+} from '@models/coffee.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
@@ -7,6 +12,7 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
   name = 'Sey';
   buyingTip =
     'Try out the monthly subscription for some pretty great savings + free shipping.';
+  sizes = [Size.TwoHundredFiftyGrams, Size.TwoPounds, Size.FivePounds];
 
   async getCountry(page: Page) {
     return page.$eval('span.coffeeTitle_country', (span: HTMLSpanElement) =>
@@ -21,9 +27,9 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
     );
   }
 
-  async getPrice(page: Page) {
+  async getPrice(page: Page, { size }: Metadata) {
     const priceString = await page.$eval(
-      'option::-p-text(250g)',
+      `option::-p-text(${size})`,
       (option: HTMLOptionElement) =>
         option.textContent!.trim().split(' - ')[1]!,
     );
@@ -56,7 +62,7 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
     );
   }
 
-  async shouldSkipProductPage(page: Page) {
-    return !!(await page.$('option::-p-text(250g - Sold Out)'));
+  async shouldSkipProductPage(page: Page, { size }: Metadata) {
+    return !!(await page.$(`option::-p-text(${size} - Sold Out)`));
   }
 }

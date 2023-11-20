@@ -1,6 +1,6 @@
 // organize-imports-ignore
 import 'dotenv/config';
-import { CoffeeShopEnum, CoffeeShopProperties } from '@models/coffee.js';
+import { CoffeeShopEnum, CoffeeShopProperties, Size } from '@models/coffee.js';
 import { CoffeaCirculor } from '@shops/coffea-circulor.js';
 import { Manhattan } from '@shops/manhattan.js';
 import { Onyx } from '@shops/onyx.js';
@@ -24,13 +24,20 @@ if (!Object.values(CoffeeShopEnum).includes(input)) {
       CoffeeShopEnum,
     )
       .map((s) => `"${s}"`)
-      .join(', ')}`,
+      .join(', ')}.`,
   );
   process.exit();
 }
 
 const shop = SHOPS[input];
 
-const products = await shop.getProducts();
+const metadata = { size: Size.TwoHundredFiftyGrams };
 
-console.log(newsFeedTemplate(shop, products));
+try {
+  const products = await shop.getProducts(metadata);
+  console.log(newsFeedTemplate(shop, products, metadata));
+} catch (e: any) {
+  console.log(e.message);
+} finally {
+  process.exit();
+}

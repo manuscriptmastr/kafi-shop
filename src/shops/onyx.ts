@@ -1,11 +1,24 @@
-import { CoffeeShop, CoffeeShopProperties } from '@models/coffee.js';
+import {
+  CoffeeShop,
+  CoffeeShopProperties,
+  Metadata,
+  Size,
+} from '@models/coffee.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
+
+const sizeMappings: Partial<Record<Size, string>> = {
+  [Size.TenOunces]: '10oz',
+  [Size.FourOunces]: '4oz',
+  [Size.TwoPounds]: '2lbs',
+  [Size.FivePounds]: '5lbs',
+};
 
 export class Onyx extends CoffeeShop implements CoffeeShopProperties {
   url = 'https://onyxcoffeelab.com';
   name = 'Onyx Coffee Lab';
   buyingTip = 'Free shipping on orders of $40 or more.';
+  sizes = [Size.FourOunces, Size.TenOunces, Size.TwoPounds, Size.FivePounds];
 
   async getCuppingScore(page: Page) {
     return page.$eval(
@@ -18,10 +31,12 @@ export class Onyx extends CoffeeShop implements CoffeeShopProperties {
     return page.$eval('h1', (h1) => h1.firstChild!.textContent!);
   }
 
-  async getPrice(page: Page) {
-    const size = (await page.$('span.generic-option[data-value="10oz"]'))!;
+  async getPrice(page: Page, { size }: Metadata) {
+    const option = (await page.$(
+      `span.generic-option[data-value="${sizeMappings[size]}"]`,
+    ))!;
 
-    await size.click();
+    await option.click();
 
     const priceText = await page.$eval('div.price.variant-price', (div) =>
       div.textContent!.trim(),
@@ -46,7 +61,9 @@ export class Onyx extends CoffeeShop implements CoffeeShopProperties {
     );
   }
 
-  async shouldSkipProductPage(page: Page) {
-    return !(await page.$('span.generic-option[data-value="10oz"]'));
+  async shouldSkipProductPage(page: Page, { size }: Metadata) {
+    return !(await page.$(
+      `span.generic-option[data-value="${sizeMappings[size]}"]`,
+    ));
   }
 }
