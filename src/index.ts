@@ -31,6 +31,12 @@ if (!Object.values(CoffeeShopEnum).includes(input)) {
 
 const shop = SHOPS[input];
 
+/**
+ * @todo This is hardcoded for now. Replace with CLI, such as:
+ * ```shell
+ * npm run shop sey --size 250g --template news-feed
+ * ```
+ */
 const metadata = { size: Size.TwoHundredFiftyGrams };
 
 try {

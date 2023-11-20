@@ -12,8 +12,8 @@ import { Page } from 'puppeteer';
 const sizeMappings: Partial<Record<Size, string>> = {
   [Size.FiveOunces]: '5 oz',
   [Size.TenOunces]: '10 oz',
-  [Size.TwoPounds]: '2 lbs',
-  [Size.FivePounds]: '5 lbs',
+  [Size.TwoPounds]: '2 lb',
+  [Size.FivePounds]: '5 lb',
 };
 
 export class Passenger extends CoffeeShop implements CoffeeShopProperties {
