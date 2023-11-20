@@ -2,9 +2,11 @@ import { CoffeeShop, CoffeeShopProperties } from '@models/coffee.js';
 import { wait } from '@utils/async.js';
 import { Page } from 'puppeteer';
 
-const DOMAIN = 'https://coffeacirculor.com';
-
 export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
+  url = 'https://coffeacirculor.com';
+  name = 'Coffea Circulor';
+  buyingTip = 'Free international shipping (and sample) when you buy 1kg.';
+
   async getCountry(page: Page) {
     return page.$eval('text/Country', (el) =>
       el.nextElementSibling!.textContent!.trim(),
@@ -55,7 +57,7 @@ export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getUrls(page: Page) {
-    await page.goto(`${DOMAIN}/collections/all`);
+    await page.goto(`${this.url}/collections/all`);
 
     while (await page.$('#section-collection a.block-fade')) {
       const moreProductsButton = (await page.$(

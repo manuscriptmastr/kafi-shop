@@ -2,9 +2,11 @@ import { CoffeeShop, CoffeeShopProperties } from '@models/coffee.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-const DOMAIN = 'https://onyxcoffeelab.com';
-
 export class Onyx extends CoffeeShop implements CoffeeShopProperties {
+  url = 'https://onyxcoffeelab.com';
+  name = 'Onyx Coffee Lab';
+  buyingTip = 'Free shipping on orders of $40 or more.';
+
   async getCuppingScore(page: Page) {
     return page.$eval(
       '[data-name="trans_cup_score"] p::-p-text(Cup Score)',
@@ -36,7 +38,7 @@ export class Onyx extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getUrls(page: Page) {
-    await page.goto(`${DOMAIN}/collections/coffee`);
+    await page.goto(`${this.url}/collections/coffee`);
 
     return page.$$eval(
       'a.product-preview[href^="/products/"]',

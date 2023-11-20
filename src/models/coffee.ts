@@ -18,6 +18,9 @@ export interface CoffeeError {
 }
 
 export interface CoffeeShopProperties {
+  url: string;
+  name: string;
+  buyingTip: string;
   getTastingNotes: (page: Page) => Promise<string[]>;
   getName: (page: Page) => Promise<string>;
   getCountry?: (page: Page) => Promise<string>;
@@ -36,18 +39,6 @@ export enum CoffeeShopEnum {
   Passenger = 'passenger',
   Sey = 'sey',
 }
-
-export const getCoffeeShopName = (shop: CoffeeShopEnum) => {
-  const coffeeShopNames: { [key in CoffeeShopEnum]: string } = {
-    [CoffeeShopEnum.CoffeaCirculor]: 'Coffea Circulor',
-    [CoffeeShopEnum.Manhattan]: 'Manhattan Coffee Roasters',
-    [CoffeeShopEnum.Onyx]: 'Onyx Coffee Lab',
-    [CoffeeShopEnum.Passenger]: 'Passenger Coffee',
-    [CoffeeShopEnum.Sey]: 'Sey',
-  };
-
-  return coffeeShopNames[shop];
-};
 
 export class CoffeeShop {
   async getProducts() {

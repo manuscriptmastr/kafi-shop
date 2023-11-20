@@ -6,6 +6,7 @@ import { Manhattan } from '@shops/manhattan.js';
 import { Onyx } from '@shops/onyx.js';
 import { Passenger } from '@shops/passenger.js';
 import { Sey } from '@shops/sey.js';
+import { newsFeedTemplate } from 'templates.js';
 
 const SHOPS: { [K in CoffeeShopEnum]: CoffeeShopProperties } = {
   [CoffeeShopEnum.CoffeaCirculor]: new CoffeaCirculor(),
@@ -15,11 +16,11 @@ const SHOPS: { [K in CoffeeShopEnum]: CoffeeShopProperties } = {
   [CoffeeShopEnum.Sey]: new Sey(),
 };
 
-const shop = process.argv[2] as CoffeeShopEnum;
+const input = process.argv[2] as CoffeeShopEnum;
 
-if (!Object.values(CoffeeShopEnum).includes(shop)) {
+if (!Object.values(CoffeeShopEnum).includes(input)) {
   console.error(
-    `"${shop}" is not supported. Currently supported shops: ${Object.values(
+    `"${input}" is not supported. Currently supported shops: ${Object.values(
       CoffeeShopEnum,
     )
       .map((s) => `"${s}"`)
@@ -28,6 +29,8 @@ if (!Object.values(CoffeeShopEnum).includes(shop)) {
   process.exit();
 }
 
-const products = await SHOPS[shop].getProducts();
+const shop = SHOPS[input];
 
-console.log(products);
+const products = await shop.getProducts();
+
+console.log(newsFeedTemplate(shop, products));

@@ -2,9 +2,12 @@ import { CoffeeShop, CoffeeShopProperties } from '@models/coffee.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-const DOMAIN = 'https://www.seycoffee.com';
-
 export class Sey extends CoffeeShop implements CoffeeShopProperties {
+  url = 'https://www.seycoffee.com';
+  name = 'Sey';
+  buyingTip =
+    'Try out the monthly subscription for some pretty great savings + free shipping.';
+
   async getCountry(page: Page) {
     return page.$eval('span.coffeeTitle_country', (span: HTMLSpanElement) =>
       span.textContent!.trim(),
@@ -46,7 +49,7 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getUrls(page: Page) {
-    await page.goto(`${DOMAIN}/collections/coffee`);
+    await page.goto(`${this.url}/collections/coffee`);
     return page.$$eval(
       'div.coffees_products_product_inner > a',
       (anchors: HTMLAnchorElement[]) => anchors.map(({ href }) => href),

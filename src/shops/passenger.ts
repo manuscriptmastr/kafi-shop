@@ -4,9 +4,12 @@ import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-const DOMAIN = 'https://www.passengercoffee.com';
-
 export class Passenger extends CoffeeShop implements CoffeeShopProperties {
+  url = 'https://www.passengercoffee.com';
+  name = 'Passenger Coffee';
+  buyingTip =
+    'Free shipping on orders of $50 or more. Also, consider buying larger bags to drastically reduce overall costs.';
+
   async getCountry(page: Page) {
     const country = await page.$eval(
       '.product-top--details .product-label--region',
@@ -41,7 +44,7 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getUrls(page: Page) {
-    await page.goto(`${DOMAIN}/collections/coffee`);
+    await page.goto(`${this.url}/collections/coffee`);
 
     await page.waitForNetworkIdle();
     await wait(3000);

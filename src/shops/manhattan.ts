@@ -3,9 +3,12 @@ import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-const DOMAIN = 'https://manhattancoffeeroasters.com';
-
 export class Manhattan extends CoffeeShop implements CoffeeShopProperties {
+  url = 'https://manhattancoffeeroasters.com';
+  name = 'Manhattan Coffee Roasters';
+  buyingTip =
+    'Free international shipping when you spend 165 euros. Great for small group orders!';
+
   async getCountry(page: Page) {
     const country = await page.$eval('::-p-text(origin)', (el) =>
       el
@@ -42,10 +45,10 @@ export class Manhattan extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getUrls(page: Page) {
-    await page.goto(`${DOMAIN}/catalog/coffee`);
+    await page.goto(`${this.url}/catalog/coffee`);
 
     return page.$$eval(
-      `a[href^="${DOMAIN}/catalog/coffee/"]`,
+      `a[href^="${this.url}/catalog/coffee/"]`,
       (anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href),
     );
   }
