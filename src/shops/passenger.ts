@@ -9,19 +9,17 @@ import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-const sizeMappings: Partial<Record<Size, string>> = {
-  [Size.FiveOunces]: '5 oz',
-  [Size.TenOunces]: '10 oz',
-  [Size.TwoPounds]: '2 lb',
-  [Size.FivePounds]: '5 lb',
-};
-
 export class Passenger extends CoffeeShop implements CoffeeShopProperties {
   url = 'https://www.passengercoffee.com';
   name = 'Passenger Coffee';
   buyingTip =
     'Free shipping on orders of $50 or more. Also, consider buying larger bags to drastically reduce overall costs.';
-  sizes = [Size.FiveOunces, Size.TenOunces, Size.TwoPounds, Size.FivePounds];
+  sizes: Partial<Record<Size, string>> = {
+    [Size.FiveOunces]: '5 oz',
+    [Size.TenOunces]: '10 oz',
+    [Size.TwoPounds]: '2 lb',
+    [Size.FivePounds]: '5 lb',
+  };
 
   async getCountry(page: Page) {
     const country = await page.$eval(
@@ -40,7 +38,7 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
 
   async getPrice(page: Page, { size }: Metadata) {
     await page.$(
-      `label.swatch:has(input[name="Size"][value="${sizeMappings[size]}"])`,
+      `label.swatch:has(input[name="Size"][value="${this.sizes[size]}"])`,
     );
 
     const priceText = await page.$eval(
@@ -76,7 +74,7 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
 
   async shouldSkipProductPage(page: Page, { size }: Metadata) {
     const option = await page.$(
-      `label.swatch:has(input[name="Size"][value="${sizeMappings[size]}"])`,
+      `label.swatch:has(input[name="Size"][value="${this.sizes[size]}"])`,
     );
 
     if (!option) {

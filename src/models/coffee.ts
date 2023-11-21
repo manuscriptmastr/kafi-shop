@@ -22,14 +22,13 @@ export interface Metadata {
 }
 
 /**
- * @todo Rephrase sizes as Partial<Record<Size, string>>, then tighten types per coffee shop
  * @todo Use static properties for url, name, buyingTip, and sizes
  */
 export interface CoffeeShopProperties {
   url: string;
   name: string;
   buyingTip: string;
-  sizes: Size[];
+  sizes: Partial<Record<Size, string>>;
   getTastingNotes: (page: Page, metadata: Metadata) => Promise<string[]>;
   getName: (page: Page, metadata: Metadata) => Promise<string>;
   getCountry?: (page: Page, metadata: Metadata) => Promise<string>;
@@ -64,17 +63,10 @@ export enum Size {
 }
 
 export class CoffeeShop {
-  async getProducts(this: CoffeeShopProperties, { size }: { size: Size }) {
-    if (!this.sizes.includes(size)) {
-      throw new Error(
-        `Coffee shop "${
-          this.name
-        }" does not have size "${size}". Try: ${this.sizes
-          .map((size) => `"${size}"`)
-          .join(', ')}.`,
-      );
-    }
-
+  async getProducts(
+    this: CoffeeShop & CoffeeShopProperties,
+    { size }: Metadata,
+  ) {
     const metadata = { size };
 
     const browser = await puppeteer.launch({ headless: 'new' });

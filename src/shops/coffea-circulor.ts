@@ -11,12 +11,12 @@ export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
   url = 'https://coffeacirculor.com';
   name = 'Coffea Circulor';
   buyingTip = 'Free international shipping (and sample) when you buy 1kg.';
-  sizes = [
-    Size.FortyGrams,
-    Size.OneHundredGrams,
-    Size.TwoHundredFiftyGrams,
-    Size.OneKilogram,
-  ];
+  sizes: Partial<Record<Size, string>> = {
+    [Size.FortyGrams]: '40g',
+    [Size.OneHundredGrams]: '100g',
+    [Size.TwoHundredFiftyGrams]: '250g',
+    [Size.OneKilogram]: '1kg',
+  };
 
   async getCountry(page: Page) {
     return page.$eval('text/Country', (el) =>
@@ -38,7 +38,7 @@ export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getPrice(page: Page, { size }: Metadata) {
-    const sizes = await page.$$(`[data-text^="${size}"] span`);
+    const sizes = await page.$$(`[data-text^="${this.sizes[size]}"] span`);
 
     const prices = [];
 
@@ -85,7 +85,7 @@ export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    const sizes = await page.$$(`[data-text^="${size}"] span`);
+    const sizes = await page.$$(`[data-text^="${this.sizes[size]}"] span`);
 
     const prices = [];
 

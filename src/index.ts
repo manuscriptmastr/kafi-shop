@@ -30,6 +30,7 @@ if (!Object.values(CoffeeShopEnum).includes(input)) {
 }
 
 const shop = SHOPS[input];
+const size = Size.TwoHundredFiftyGrams;
 
 /**
  * @todo This is hardcoded for now. Replace with CLI, such as:
@@ -37,7 +38,18 @@ const shop = SHOPS[input];
  * npm run shop sey --size 250g --template news-feed
  * ```
  */
-const metadata = { size: Size.TwoHundredFiftyGrams };
+
+if (!(size in shop.sizes)) {
+  throw new Error(
+    `Coffee shop "${
+      shop.name
+    }" does not have size "${size}". Try: ${Object.keys(shop.sizes)
+      .map((size) => `"${size}"`)
+      .join(', ')}.`,
+  );
+}
+
+const metadata = { size };
 
 try {
   const products = await shop.getProducts(metadata);

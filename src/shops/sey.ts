@@ -12,7 +12,11 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
   name = 'Sey';
   buyingTip =
     'Try out the monthly subscription for some pretty great savings + free shipping.';
-  sizes = [Size.TwoHundredFiftyGrams, Size.TwoPounds, Size.FivePounds];
+  sizes: Partial<Record<Size, string>> = {
+    [Size.TwoHundredFiftyGrams]: '250g',
+    [Size.TwoPounds]: '2lb',
+    [Size.FivePounds]: '5lb',
+  };
 
   async getCountry(page: Page) {
     return page.$eval('span.coffeeTitle_country', (span: HTMLSpanElement) =>
@@ -29,7 +33,7 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
 
   async getPrice(page: Page, { size }: Metadata) {
     const priceString = await page.$eval(
-      `option::-p-text(${size})`,
+      `option::-p-text(${this.sizes[size]})`,
       (option: HTMLOptionElement) =>
         option.textContent!.trim().split(' - ')[1]!,
     );
@@ -63,6 +67,6 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    return !!(await page.$(`option::-p-text(${size} - Sold Out)`));
+    return !!(await page.$(`option::-p-text(${this.sizes[size]} - Sold Out)`));
   }
 }

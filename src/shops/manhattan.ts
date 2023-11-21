@@ -8,24 +8,17 @@ import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-const sizeMappings: Partial<Record<Size, string>> = {
-  [Size.OneHundredTwentyFiveGrams]: '125 gram',
-  [Size.TwoHundredFiftyGrams]: '250 gram',
-  [Size.FiveHundredGrams]: '500 gram',
-  [Size.OneKilogram]: '1000 gram',
-};
-
 export class Manhattan extends CoffeeShop implements CoffeeShopProperties {
   url = 'https://manhattancoffeeroasters.com';
   name = 'Manhattan Coffee Roasters';
   buyingTip =
     'Free international shipping when you spend 165 euros. Great for small group orders!';
-  sizes = [
-    Size.OneHundredTwentyFiveGrams,
-    Size.TwoHundredFiftyGrams,
-    Size.FiveHundredGrams,
-    Size.OneKilogram,
-  ];
+  sizes: Partial<Record<Size, string>> = {
+    [Size.OneHundredTwentyFiveGrams]: '125 gram',
+    [Size.TwoHundredFiftyGrams]: '250 gram',
+    [Size.FiveHundredGrams]: '500 gram',
+    [Size.OneKilogram]: '1000 gram',
+  };
 
   async getCountry(page: Page) {
     const country = await page.$eval('::-p-text(origin)', (el) =>
@@ -42,7 +35,7 @@ export class Manhattan extends CoffeeShop implements CoffeeShopProperties {
 
   async getPrice(page: Page, { size }: Metadata) {
     const priceText = await page.$eval(
-      `::-p-text(${sizeMappings[size]} whole coffee beans)`,
+      `::-p-text(${this.sizes[size]} whole coffee beans)`,
       (el) =>
         el.parentElement!.nextElementSibling!.firstElementChild!.textContent!.trim(),
     );
