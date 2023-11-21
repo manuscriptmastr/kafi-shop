@@ -1,31 +1,30 @@
-// organize-imports-ignore
-import 'dotenv/config';
+#!/usr/bin/env -S node
 import { Size } from '@models/coffee.js';
-import { newsFeedTemplate } from 'templates.js';
 import { CoffeeShopEnum, SHOPS } from '@shops/index.js';
+import { newsFeedTemplate } from 'templates.js';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
-/**
- * @todo This is hardcoded for now. Replace with CLI, such as:
- * ```shell
- * npm run shop sey --size 250g --template news-feed
- * ```
- */
-
-const input = process.argv[2] as CoffeeShopEnum;
-
-if (!Object.values(CoffeeShopEnum).includes(input)) {
-  console.error(
-    `Coffee shop "${input}" is not supported. Try: ${Object.values(
-      CoffeeShopEnum,
-    )
-      .map((s) => `"${s}"`)
-      .join(', ')}.`,
-  );
-  process.exit();
+interface UserInput {
+  shop: CoffeeShopEnum;
+  size: Size;
 }
 
-const shop = SHOPS[input];
-const size = Size.TwoHundredFiftyGrams;
+// @ts-ignore
+const { shop: shopEnum, size }: UserInput = yargs(hideBin(process.argv))
+  .option('shop', {
+    choices: Object.values(CoffeeShopEnum),
+    type: 'string',
+  })
+  .option('size', {
+    choices: Object.values(Size),
+    type: 'string',
+  })
+  .help()
+  .version(false)
+  .parseSync();
+
+const shop = SHOPS[shopEnum];
 
 if (!(size in shop.sizes)) {
   throw new Error(
