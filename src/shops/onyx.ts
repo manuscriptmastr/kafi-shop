@@ -1,5 +1,5 @@
 import {
-  CoffeeShop,
+  CoffeeShopBase,
   CoffeeShopProperties,
   Metadata,
   Size,
@@ -7,16 +7,16 @@ import {
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-export class Onyx extends CoffeeShop implements CoffeeShopProperties {
-  url = 'https://onyxcoffeelab.com';
-  name = 'Onyx Coffee Lab';
-  buyingTip = 'Free shipping on orders of $40 or more.';
-  sizes: Partial<Record<Size, string>> = {
+export class Onyx extends CoffeeShopBase implements CoffeeShopProperties {
+  static buyingTip = 'Free shipping on orders of $40 or more.';
+  static name = 'Onyx Coffee Lab';
+  static sizes: Partial<Record<Size, string>> = {
     [Size.FourOunces]: '4oz',
     [Size.TenOunces]: '10oz',
     [Size.TwoPounds]: '2lbs',
     [Size.FivePounds]: '5lbs',
   };
+  static url = 'https://onyxcoffeelab.com';
 
   async getCuppingScore(page: Page) {
     return page.$eval(
@@ -31,7 +31,7 @@ export class Onyx extends CoffeeShop implements CoffeeShopProperties {
 
   async getPrice(page: Page, { size }: Metadata) {
     const option = (await page.$(
-      `span.generic-option[data-value="${this.sizes[size]}"]`,
+      `span.generic-option[data-value="${Onyx.sizes[size]}"]`,
     ))!;
 
     await option.click();
@@ -51,7 +51,7 @@ export class Onyx extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getUrls(page: Page) {
-    await page.goto(`${this.url}/collections/coffee`);
+    await page.goto(`${Onyx.url}/collections/coffee`);
 
     return page.$$eval(
       'a.product-preview[href^="/products/"]',
@@ -61,7 +61,7 @@ export class Onyx extends CoffeeShop implements CoffeeShopProperties {
 
   async shouldSkipProductPage(page: Page, { size }: Metadata) {
     return !(await page.$(
-      `span.generic-option[data-value="${this.sizes[size]}"]`,
+      `span.generic-option[data-value="${Onyx.sizes[size]}"]`,
     ));
   }
 }

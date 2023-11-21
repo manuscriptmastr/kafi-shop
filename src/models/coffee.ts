@@ -21,14 +21,7 @@ export interface Metadata {
   size: Size;
 }
 
-/**
- * @todo Use static properties for url, name, buyingTip, and sizes
- */
 export interface CoffeeShopProperties {
-  url: string;
-  name: string;
-  buyingTip: string;
-  sizes: Partial<Record<Size, string>>;
   getTastingNotes: (page: Page, metadata: Metadata) => Promise<string[]>;
   getName: (page: Page, metadata: Metadata) => Promise<string>;
   getCountry?: (page: Page, metadata: Metadata) => Promise<string>;
@@ -38,14 +31,6 @@ export interface CoffeeShopProperties {
   getUrls: (page: Page, metadata: Metadata) => Promise<string[]>;
   setupProductPage?: (page: Page, metadata: Metadata) => Promise<void>;
   shouldSkipProductPage: (page: Page, metadata: Metadata) => Promise<boolean>;
-}
-
-export enum CoffeeShopEnum {
-  CoffeaCirculor = 'coffea-circulor',
-  Manhattan = 'manhattan',
-  Onyx = 'onyx',
-  Passenger = 'passenger',
-  Sey = 'sey',
 }
 
 export enum Size {
@@ -62,9 +47,9 @@ export enum Size {
   FivePounds = '5lb',
 }
 
-export class CoffeeShop {
+export class CoffeeShopBase {
   async getProducts(
-    this: CoffeeShop & CoffeeShopProperties,
+    this: CoffeeShopBase & CoffeeShopProperties,
     { size }: Metadata,
   ) {
     const metadata = { size };

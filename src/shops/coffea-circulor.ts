@@ -1,5 +1,5 @@
 import {
-  CoffeeShop,
+  CoffeeShopBase,
   CoffeeShopProperties,
   Metadata,
   Size,
@@ -7,16 +7,20 @@ import {
 import { wait } from '@utils/async.js';
 import { Page } from 'puppeteer';
 
-export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
-  url = 'https://coffeacirculor.com';
-  name = 'Coffea Circulor';
-  buyingTip = 'Free international shipping (and sample) when you buy 1kg.';
-  sizes: Partial<Record<Size, string>> = {
+export class CoffeaCirculor
+  extends CoffeeShopBase
+  implements CoffeeShopProperties
+{
+  static buyingTip =
+    'Free international shipping (and sample) when you buy 1kg.';
+  static name = 'Coffea Circulor';
+  static sizes: Partial<Record<Size, string>> = {
     [Size.FortyGrams]: '40g',
     [Size.OneHundredGrams]: '100g',
     [Size.TwoHundredFiftyGrams]: '250g',
     [Size.OneKilogram]: '1kg',
   };
+  static url = 'https://coffeacirculor.com';
 
   async getCountry(page: Page) {
     return page.$eval('text/Country', (el) =>
@@ -38,7 +42,9 @@ export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getPrice(page: Page, { size }: Metadata) {
-    const sizes = await page.$$(`[data-text^="${this.sizes[size]}"] span`);
+    const sizes = await page.$$(
+      `[data-text^="${CoffeaCirculor.sizes[size]}"] span`,
+    );
 
     const prices = [];
 
@@ -68,7 +74,7 @@ export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getUrls(page: Page) {
-    await page.goto(`${this.url}/collections/all`);
+    await page.goto(`${CoffeaCirculor.url}/collections/all`);
 
     while (await page.$('#section-collection a.block-fade')) {
       const moreProductsButton = (await page.$(
@@ -85,7 +91,9 @@ export class CoffeaCirculor extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    const sizes = await page.$$(`[data-text^="${this.sizes[size]}"] span`);
+    const sizes = await page.$$(
+      `[data-text^="${CoffeaCirculor.sizes[size]}"] span`,
+    );
 
     const prices = [];
 

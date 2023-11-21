@@ -1,5 +1,5 @@
 import {
-  CoffeeShop,
+  CoffeeShopBase,
   CoffeeShopProperties,
   Metadata,
   Size,
@@ -7,16 +7,16 @@ import {
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-export class Sey extends CoffeeShop implements CoffeeShopProperties {
-  url = 'https://www.seycoffee.com';
-  name = 'Sey';
-  buyingTip =
+export class Sey extends CoffeeShopBase implements CoffeeShopProperties {
+  static buyingTip =
     'Try out the monthly subscription for some pretty great savings + free shipping.';
-  sizes: Partial<Record<Size, string>> = {
+  static name = 'Sey';
+  static sizes: Partial<Record<Size, string>> = {
     [Size.TwoHundredFiftyGrams]: '250g',
     [Size.TwoPounds]: '2lb',
     [Size.FivePounds]: '5lb',
   };
+  static url = 'https://www.seycoffee.com';
 
   async getCountry(page: Page) {
     return page.$eval('span.coffeeTitle_country', (span: HTMLSpanElement) =>
@@ -33,7 +33,7 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
 
   async getPrice(page: Page, { size }: Metadata) {
     const priceString = await page.$eval(
-      `option::-p-text(${this.sizes[size]})`,
+      `option::-p-text(${Sey.sizes[size]})`,
       (option: HTMLOptionElement) =>
         option.textContent!.trim().split(' - ')[1]!,
     );
@@ -59,7 +59,7 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getUrls(page: Page) {
-    await page.goto(`${this.url}/collections/coffee`);
+    await page.goto(`${Sey.url}/collections/coffee`);
     return page.$$eval(
       'div.coffees_products_product_inner > a',
       (anchors: HTMLAnchorElement[]) => anchors.map(({ href }) => href),
@@ -67,6 +67,6 @@ export class Sey extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    return !!(await page.$(`option::-p-text(${this.sizes[size]} - Sold Out)`));
+    return !!(await page.$(`option::-p-text(${Sey.sizes[size]} - Sold Out)`));
   }
 }

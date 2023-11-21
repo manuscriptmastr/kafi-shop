@@ -1,5 +1,5 @@
 import {
-  CoffeeShop,
+  CoffeeShopBase,
   CoffeeShopProperties,
   Metadata,
   Size,
@@ -9,17 +9,17 @@ import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-export class Passenger extends CoffeeShop implements CoffeeShopProperties {
-  url = 'https://www.passengercoffee.com';
-  name = 'Passenger Coffee';
-  buyingTip =
+export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
+  static buyingTip =
     'Free shipping on orders of $50 or more. Also, consider buying larger bags to drastically reduce overall costs.';
-  sizes: Partial<Record<Size, string>> = {
+  static name = 'Passenger Coffee';
+  static sizes: Partial<Record<Size, string>> = {
     [Size.FiveOunces]: '5 oz',
     [Size.TenOunces]: '10 oz',
     [Size.TwoPounds]: '2 lb',
     [Size.FivePounds]: '5 lb',
   };
+  static url = 'https://www.passengercoffee.com';
 
   async getCountry(page: Page) {
     const country = await page.$eval(
@@ -38,7 +38,7 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
 
   async getPrice(page: Page, { size }: Metadata) {
     await page.$(
-      `label.swatch:has(input[name="Size"][value="${this.sizes[size]}"])`,
+      `label.swatch:has(input[name="Size"][value="${Passenger.sizes[size]}"])`,
     );
 
     const priceText = await page.$eval(
@@ -57,7 +57,7 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getUrls(page: Page) {
-    await page.goto(`${this.url}/collections/coffee`);
+    await page.goto(`${Passenger.url}/collections/coffee`);
 
     await page.waitForNetworkIdle();
     await wait(3000);
@@ -74,7 +74,7 @@ export class Passenger extends CoffeeShop implements CoffeeShopProperties {
 
   async shouldSkipProductPage(page: Page, { size }: Metadata) {
     const option = await page.$(
-      `label.swatch:has(input[name="Size"][value="${this.sizes[size]}"])`,
+      `label.swatch:has(input[name="Size"][value="${Passenger.sizes[size]}"])`,
     );
 
     if (!option) {

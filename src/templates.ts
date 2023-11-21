@@ -1,13 +1,9 @@
-import {
-  Coffee,
-  CoffeeError,
-  CoffeeShopProperties,
-  Metadata,
-} from '@models/coffee.js';
+import { Coffee, CoffeeError, Metadata } from '@models/coffee.js';
+import { CoffeeShop } from '@shops/index.js';
 import currency from 'currency.js';
 
 export const newsFeedTemplate = (
-  coffeeShop: CoffeeShopProperties,
+  coffeeShop: CoffeeShop,
   coffeesOrErrors: (Coffee | CoffeeError)[],
   metadata: Metadata,
 ) => {

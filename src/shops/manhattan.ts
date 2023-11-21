@@ -1,5 +1,5 @@
 import {
-  CoffeeShop,
+  CoffeeShopBase,
   CoffeeShopProperties,
   Metadata,
   Size,
@@ -8,17 +8,17 @@ import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-export class Manhattan extends CoffeeShop implements CoffeeShopProperties {
-  url = 'https://manhattancoffeeroasters.com';
-  name = 'Manhattan Coffee Roasters';
-  buyingTip =
+export class Manhattan extends CoffeeShopBase implements CoffeeShopProperties {
+  static buyingTip =
     'Free international shipping when you spend 165 euros. Great for small group orders!';
-  sizes: Partial<Record<Size, string>> = {
+  static name = 'Manhattan Coffee Roasters';
+  static sizes: Partial<Record<Size, string>> = {
     [Size.OneHundredTwentyFiveGrams]: '125 gram',
     [Size.TwoHundredFiftyGrams]: '250 gram',
     [Size.FiveHundredGrams]: '500 gram',
     [Size.OneKilogram]: '1000 gram',
   };
+  static url = 'https://manhattancoffeeroasters.com';
 
   async getCountry(page: Page) {
     const country = await page.$eval('::-p-text(origin)', (el) =>
@@ -35,7 +35,7 @@ export class Manhattan extends CoffeeShop implements CoffeeShopProperties {
 
   async getPrice(page: Page, { size }: Metadata) {
     const priceText = await page.$eval(
-      `::-p-text(${this.sizes[size]} whole coffee beans)`,
+      `::-p-text(${Manhattan.sizes[size]} whole coffee beans)`,
       (el) =>
         el.parentElement!.nextElementSibling!.firstElementChild!.textContent!.trim(),
     );
@@ -56,10 +56,10 @@ export class Manhattan extends CoffeeShop implements CoffeeShopProperties {
   }
 
   async getUrls(page: Page) {
-    await page.goto(`${this.url}/catalog/coffee`);
+    await page.goto(`${Manhattan.url}/catalog/coffee`);
 
     return page.$$eval(
-      `a[href^="${this.url}/catalog/coffee/"]`,
+      `a[href^="${Manhattan.url}/catalog/coffee/"]`,
       (anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href),
     );
   }
