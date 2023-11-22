@@ -4,7 +4,7 @@ import { Onyx } from './onyx.js';
 import { Passenger } from './passenger.js';
 import { Sey } from './sey.js';
 
-export enum CoffeeShopEnum {
+export enum Shop {
   CoffeaCirculor = 'coffea-circulor',
   Manhattan = 'manhattan',
   Onyx = 'onyx',
@@ -13,11 +13,11 @@ export enum CoffeeShopEnum {
 }
 
 export const SHOPS = {
-  [CoffeeShopEnum.CoffeaCirculor]: CoffeaCirculor,
-  [CoffeeShopEnum.Manhattan]: Manhattan,
-  [CoffeeShopEnum.Onyx]: Onyx,
-  [CoffeeShopEnum.Passenger]: Passenger,
-  [CoffeeShopEnum.Sey]: Sey,
+  [Shop.CoffeaCirculor]: CoffeaCirculor,
+  [Shop.Manhattan]: Manhattan,
+  [Shop.Onyx]: Onyx,
+  [Shop.Passenger]: Passenger,
+  [Shop.Sey]: Sey,
 };
 
 export type CoffeeShop = (typeof SHOPS)[keyof typeof SHOPS];

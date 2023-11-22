@@ -2,7 +2,18 @@ import { Coffee, CoffeeError, Metadata } from '@models/coffee.js';
 import { CoffeeShop } from '@shops/index.js';
 import currency from 'currency.js';
 
-export const newsFeedTemplate = (
+export enum Template {
+  Json = 'json',
+  Markdown = 'markdown',
+}
+
+export const jsonTemplate = (
+  coffeeShop: CoffeeShop,
+  coffeesOrErrors: (Coffee | CoffeeError)[],
+  metadata: Metadata,
+) => coffeesOrErrors;
+
+export const markdownTemplate = (
   coffeeShop: CoffeeShop,
   coffeesOrErrors: (Coffee | CoffeeError)[],
   metadata: Metadata,
@@ -38,4 +49,9 @@ ${coffeesToList(coffees.filter(({ price }) => price >= 25 && price <= 30))}
 
 *${coffeeShop.buyingTip}*
 	`;
+};
+
+export const TEMPLATES = {
+  [Template.Json]: jsonTemplate,
+  [Template.Markdown]: markdownTemplate,
 };
