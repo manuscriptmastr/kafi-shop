@@ -30,6 +30,7 @@ npm run shop <coffea-circulor|manhattan|onyx|passenger|sey> [size] [template]
 
 `npm run shop sey --size 250g --template markdown` generates:
 
+```md
 **[Sey](https://www.seycoffee.com)**
 _Note: Prices reflect 250g size._
 
@@ -53,3 +54,4 @@ _No coffees in this price range._
 - [Duwancho (Ethiopia, $25.25)](https://www.seycoffee.com/collections/coffee/products/duwancho-washed-2023): In the cup we find lively acidity, watermelon, honeydew, and jasmine.
 
 **Try out the monthly subscription for some pretty great savings + free shipping.**
+```
