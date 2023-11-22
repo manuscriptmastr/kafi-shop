@@ -5,14 +5,12 @@
   "type": "module",
   "scripts": {
     "build": "tsc && tsc-alias",
-    "build:watch": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
-    "lint": "prettier --write ."
+    "lint": "prettier --write .",
+    "shop": "npm run build && ./dist/index.js"
   },
-  "bin": "dist/index.js",
   "author": "Joshua Martin",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^8.2.2",
     "currency.js": "^2.0.4",
     "puppeteer": "^21.2.1",
     "tsc-alias": "^1.8.8",

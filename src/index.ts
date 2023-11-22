@@ -21,6 +21,7 @@ const {
   size,
   template: templateInput,
 }: UserInput = yargs(hideBin(process.argv))
+  .scriptName('kafi-shop')
   .command('$0 <shop> [size] [template]', 'Shop for coffees', (yargs) =>
     yargs
       .positional('shop', {
