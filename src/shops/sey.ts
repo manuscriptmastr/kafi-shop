@@ -67,6 +67,9 @@ export class Sey extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    return !!(await page.$(`option::-p-text(${Sey.sizes[size]} - Sold Out)`));
+    return (
+      !(await page.$('select')) ||
+      !!(await page.$(`option::-p-text(${Sey.sizes[size]} - Sold Out)`))
+    );
   }
 }
