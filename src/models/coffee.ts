@@ -1,4 +1,5 @@
 import { mapAsync } from '@utils/async.js';
+import { archiveProducts, retrieveArchive } from '@utils/file.js';
 import { limit } from '@utils/semaphore.js';
 import puppeteer, { Page } from 'puppeteer';
 
@@ -11,10 +12,8 @@ export interface Coffee {
   url: string;
 }
 
-export interface CoffeeError {
-  error: string;
-  price: 0;
-  url: string;
+export interface CoffeeWithNewFlag extends Coffee {
+  new: boolean;
 }
 
 export interface Metadata {
@@ -27,7 +26,7 @@ export interface CoffeeShopProperties {
   getCountry?: (page: Page, metadata: Metadata) => Promise<string>;
   getCuppingScore?: (page: Page, metadata: Metadata) => Promise<number>;
   getPrice: (page: Page, metadata: Metadata) => Promise<number>;
-  getProducts: (metadata: Metadata) => Promise<(Coffee | CoffeeError)[]>;
+  getProducts: (metadata: Metadata) => Promise<CoffeeWithNewFlag[]>;
   getUrls: (page: Page, metadata: Metadata) => Promise<string[]>;
   setupProductPage?: (page: Page, metadata: Metadata) => Promise<void>;
   shouldSkipProductPage: (page: Page, metadata: Metadata) => Promise<boolean>;
@@ -63,53 +62,59 @@ export class CoffeeShopBase {
 
     const unfilteredProducts: Coffee[] = await mapAsync(
       urls,
-      limit(10, async (url: string): Promise<Coffee | CoffeeError | null> => {
-        try {
-          const page = await browser.newPage();
-          await page.goto(url);
+      limit(10, async (url: string): Promise<Coffee | null> => {
+        const page = await browser.newPage();
+        await page.goto(url);
 
-          // @ts-ignore
-          if (await this.shouldSkipProductPage(page, metadata)) {
-            page.close();
-            return null;
-          }
-
-          if ('setupProductPage' in this) {
-            // @ts-ignore
-            await this.setupProductPage(page, metadata);
-          }
-
-          const [name, country, tastingNotes, price, cuppingScore] =
-            await Promise.all([
-              // @ts-ignore
-              this.getName(page, metadata),
-              'getCountry' in this
-                ? // @ts-ignore
-                  this.getCountry(page, metadata)
-                : ('N/A' as const),
-              // @ts-ignore
-              this.getTastingNotes(page, metadata),
-              // @ts-ignore
-              this.getPrice(page, metadata),
-              'getCuppingScore' in this
-                ? // @ts-ignore
-                  this.getCuppingScore(page, metadata)
-                : ('N/A' as const),
-            ]);
-
-          await page.close();
-          return { name, country, tastingNotes, price, cuppingScore, url };
-        } catch (e) {
-          await page.close();
-          return { error: e!.toString(), price: 0, url };
+        // @ts-ignore
+        if (await this.shouldSkipProductPage(page, metadata)) {
+          page.close();
+          return null;
         }
+
+        if ('setupProductPage' in this) {
+          // @ts-ignore
+          await this.setupProductPage(page, metadata);
+        }
+
+        const [name, country, tastingNotes, price, cuppingScore] =
+          await Promise.all([
+            // @ts-ignore
+            this.getName(page, metadata),
+            'getCountry' in this
+              ? // @ts-ignore
+                this.getCountry(page, metadata)
+              : ('N/A' as const),
+            // @ts-ignore
+            this.getTastingNotes(page, metadata),
+            // @ts-ignore
+            this.getPrice(page, metadata),
+            'getCuppingScore' in this
+              ? // @ts-ignore
+                this.getCuppingScore(page, metadata)
+              : ('N/A' as const),
+          ]);
+
+        await page.close();
+        return { name, country, tastingNotes, price, cuppingScore, url };
       }),
     );
+
+    await browser.close();
 
     const products = unfilteredProducts
       .filter((p) => p)
       .sort((a, b) => a.price - b.price);
-    await browser.close();
-    return products;
+
+    const lastArchive = (await retrieveArchive(this.constructor.name)) ?? [];
+
+    const productsWithNewFlag = products.map((product) => ({
+      ...product,
+      new: !lastArchive.some(({ url }) => product.url === url),
+    }));
+
+    await archiveProducts(this.constructor.name, products);
+
+    return productsWithNewFlag;
   }
 }

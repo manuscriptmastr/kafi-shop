@@ -1,4 +1,4 @@
-import { Coffee, CoffeeError, Metadata } from '@models/coffee.js';
+import { CoffeeWithNewFlag, Metadata } from '@models/coffee.js';
 import { CoffeeShop } from '@shops/index.js';
 import currency from 'currency.js';
 
@@ -9,27 +9,23 @@ export enum Template {
 
 export const jsonTemplate = (
   coffeeShop: CoffeeShop,
-  coffeesOrErrors: (Coffee | CoffeeError)[],
+  coffees: CoffeeWithNewFlag[],
   metadata: Metadata,
-) => coffeesOrErrors;
+) => coffees;
 
 export const markdownTemplate = (
   coffeeShop: CoffeeShop,
-  coffeesOrErrors: (Coffee | CoffeeError)[],
+  coffees: CoffeeWithNewFlag[],
   metadata: Metadata,
 ) => {
-  const coffees = coffeesOrErrors.filter(
-    (coffee) => !('error' in coffee),
-  ) as Coffee[];
-
-  const coffeesToList = (coffees: Coffee[]) =>
+  const coffeesToList = (coffees: CoffeeWithNewFlag[]) =>
     coffees.length
       ? coffees
           .map(
-            ({ country, name, price, tastingNotes, url }) =>
-              `- [${name} (${country}, ${currency(
-                price,
-              ).format()})](${url}): ${tastingNotes.join(', ')}`,
+            ({ country, name, new: isNew, price, tastingNotes, url }) =>
+              `- [${name} (${country}, ${currency(price).format()})](${url}) ${
+                isNew ? ' *NEW*' : ''
+              }: ${tastingNotes.join(', ')}`,
           )
           .join('\n')
       : '_No coffees in this price range._';

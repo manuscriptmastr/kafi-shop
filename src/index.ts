@@ -1,7 +1,6 @@
 #!/usr/bin/env -S node
 import { Size } from '@models/coffee.js';
 import { Shop, SHOPS } from '@shops/index.js';
-import { archiveProducts } from '@utils/file.js';
 import { Template, TEMPLATES } from 'templates.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -60,5 +59,4 @@ if (!(size in shop.sizes)) {
 const metadata = { size };
 
 const products = await new shop().getProducts(metadata);
-await archiveProducts(shopInput, products);
 console.log(template(shop, products, metadata));
