@@ -9,6 +9,9 @@ import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
+/**
+ * @todo Passenger just updated their site. Update this class.
+ */
 export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip =
     'Free shipping on orders of $50 or more. Also, consider buying larger bags to drastically reduce overall costs.';
