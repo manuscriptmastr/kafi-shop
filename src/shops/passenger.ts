@@ -4,7 +4,6 @@ import {
   Metadata,
   Size,
 } from '@models/coffee.js';
-import { wait } from '@utils/async.js';
 import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
@@ -62,15 +61,18 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
   async getUrls(page: Page) {
     await page.goto(`${Passenger.url}/collections/coffee`);
 
-    await page.waitForNetworkIdle();
-    await wait(3000);
+    while (await page.$('text/Load more products')) {
+      await page.click('text/Load more products');
+      await page.waitForNetworkIdle();
+    }
 
     return page.$$eval(
-      'div.product-data:not(:has(.sold-out)) a[href^="/products/"]',
+      '#mainContent a.w-full[href^="/products/"]',
       (anchors: HTMLAnchorElement[]) =>
         anchors
           .filter((a) => !/instant/gi.test(a.textContent!))
-          .filter((a) => !/decaf/gi.test(a.textContent!))
+          .filter((a) => !/set/gi.test(a.textContent!))
+          .filter((a) => !/necessary/gi.test(a.textContent!))
           .map((a) => a.href),
     );
   }
