@@ -65,6 +65,7 @@ export class CoffeeShopBase {
       limit(10, async (url: string): Promise<Coffee | null> => {
         const page = await browser.newPage();
         await page.goto(url);
+        await page.waitForNetworkIdle();
 
         // @ts-ignore
         if (await this.shouldSkipProductPage(page, metadata)) {

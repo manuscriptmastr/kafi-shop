@@ -8,9 +8,6 @@ import { capitalize } from '@utils/data.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
-/**
- * @todo Passenger just updated their site. Update this class.
- */
 export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip =
     'Free shipping on orders of $50 or more. Also, consider buying larger bags to drastically reduce overall costs.';
@@ -25,7 +22,7 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
 
   async getCountry(page: Page) {
     const country = await page.$eval(
-      '.product-top--details .product-label--region',
+      '#mainContent .max-w-content .block.leading-none',
       (dd) => dd.textContent!.trim(),
     );
     return capitalize(country);
@@ -33,28 +30,28 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
 
   async getName(page: Page) {
     return page.$eval(
-      '.product-top--details .product-label--title h2 span',
+      '#mainContent .max-w-content h2.leading-none span',
       (span) => span.textContent!.trim(),
     );
   }
 
   async getPrice(page: Page, { size }: Metadata) {
-    await page.$(
-      `label.swatch:has(input[name="Size"][value="${Passenger.sizes[size]}"])`,
-    );
-
+    const option = (await page.$(`text/${Passenger.sizes[size]}`))!;
+    await option.click();
+    await page.waitForNetworkIdle();
     const priceText = await page.$eval(
-      '.product-top--details .product-top--details-price span[data-product-price]',
-      (span) => span.textContent!.trim(),
+      `#mainContent .max-w-content span::-p-text($)`,
+      (span: HTMLSpanElement) => span.textContent!.trim(),
     );
 
     return currency(priceText).value;
   }
 
   async getTastingNotes(page: Page) {
-    return page.$$eval(
-      '.product-top--details .product-label--notes ul li',
-      (lis) => lis.map((li) => li.textContent!.trim()),
+    return page.$eval('text/with notes of', (dd) =>
+      Array.from(dd.firstElementChild!.childNodes).map((lis) =>
+        lis.textContent!.trim(),
+      ),
     );
   }
 
@@ -78,22 +75,16 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    const option = await page.$(
-      `label.swatch:has(input[name="Size"][value="${Passenger.sizes[size]}"])`,
-    );
+    const option = await page.$(`text/${Passenger.sizes[size]}`);
 
     if (!option) {
       return true;
     }
 
     await option.click();
+    await page.waitForNetworkIdle();
 
-    const isAddToCartDisabled = await page.$eval(
-      'button[type=submit][name=add]',
-      (button) => button.disabled,
-    );
-
-    if (isAddToCartDisabled) {
+    if (await page.$('text/Currently Unavailable')) {
       return true;
     }
 
