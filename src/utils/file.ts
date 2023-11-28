@@ -3,11 +3,12 @@ import { mkdir, readFile, readdir, writeFile } from 'fs/promises';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 
-export const rootDir = resolve(fileURLToPath(import.meta.url), '../../../');
+export const ROOT_DIR = resolve(fileURLToPath(import.meta.url), '../../../');
+export const CACHE_DIR = resolve(ROOT_DIR, 'cache');
 
-export const archiveProducts = async (folder: string, products: Coffee[]) => {
+export const cacheProducts = async (folder: string, products: Coffee[]) => {
   const unixTimestamp = Date.now();
-  const dir = resolve(rootDir, 'archives', folder);
+  const dir = resolve(CACHE_DIR, folder);
   await mkdir(dir, { recursive: true });
   await writeFile(
     resolve(dir, `${unixTimestamp}.json`),
@@ -15,8 +16,8 @@ export const archiveProducts = async (folder: string, products: Coffee[]) => {
   );
 };
 
-export const retrieveArchive = async (folder: string, index = -1) => {
-  const dir = resolve(rootDir, 'archives', folder);
+export const retrieveCache = async (folder: string, index = -1) => {
+  const dir = resolve(CACHE_DIR, folder);
   try {
     const filenames = await readdir(dir);
     return filenames.length === 0

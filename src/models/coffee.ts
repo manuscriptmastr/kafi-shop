@@ -1,5 +1,5 @@
 import { mapAsync } from '@utils/async.js';
-import { archiveProducts, retrieveArchive } from '@utils/file.js';
+import { cacheProducts, retrieveCache } from '@utils/file.js';
 import { limit } from '@utils/semaphore.js';
 import puppeteer, { Page } from 'puppeteer';
 
@@ -107,14 +107,14 @@ export class CoffeeShopBase {
       .filter((p) => p)
       .sort((a, b) => a.price - b.price);
 
-    const lastArchive = (await retrieveArchive(this.constructor.name)) ?? [];
+    const lastCache = (await retrieveCache(this.constructor.name)) ?? [];
 
     const productsWithNewFlag = products.map((product) => ({
       ...product,
-      new: !lastArchive.some(({ url }) => product.url === url),
+      new: !lastCache.some(({ url }) => product.url === url),
     }));
 
-    await archiveProducts(this.constructor.name, products);
+    await cacheProducts(this.constructor.name, products);
 
     return productsWithNewFlag;
   }
