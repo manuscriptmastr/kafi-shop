@@ -59,8 +59,18 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
     await page.goto(`${Passenger.url}/collections/coffee`);
 
     while (await page.$('text/Load more products')) {
+      const productsLength = await page.$$eval(
+        '#mainContent a.w-full[href^="/products/"]',
+        (anchors: HTMLAnchorElement[]) => anchors.length,
+      );
       await page.click('text/Load more products');
-      await page.waitForNetworkIdle();
+      await page.waitForFunction(
+        (len) =>
+          document.querySelectorAll('#mainContent a.w-full[href^="/products/"]')
+            .length > len,
+        undefined,
+        productsLength,
+      );
     }
 
     return page.$$eval(

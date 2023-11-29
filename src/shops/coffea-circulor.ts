@@ -4,7 +4,6 @@ import {
   Metadata,
   Size,
 } from '@models/coffee.js';
-import { wait } from '@utils/async.js';
 import { Page } from 'puppeteer';
 
 export class CoffeaCirculor
@@ -81,7 +80,10 @@ export class CoffeaCirculor
         '#section-collection a.block-fade',
       ))!;
       await moreProductsButton.click();
-      await wait(1000);
+      await page.waitForFunction(
+        () =>
+          !document.querySelector('#section-collection a.block-fade.loading'),
+      );
     }
 
     return page.$$eval(
