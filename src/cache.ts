@@ -1,6 +1,6 @@
-import { CACHE_DIR } from '@utils';
 import { mkdir, readFile, readdir, writeFile } from 'fs/promises';
 import { resolve } from 'path';
+import { CACHE_DIR } from './constants.js';
 
 export class Cache {
   async get<T>(key: string) {

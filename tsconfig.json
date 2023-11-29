@@ -9,7 +9,7 @@
     "paths": {
       "@models/*": ["models/*"],
       "@shops/*": ["shops/*"],
-      "@utils": ["utils/index.ts"]
+      "@utils": ["utils.ts"]
     }
   },
   "include": ["**/*.ts"]
