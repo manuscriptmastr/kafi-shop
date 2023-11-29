@@ -1,7 +1,6 @@
-import { mapAsync } from '@utils/async.js';
-import { cacheProducts, retrieveCache } from '@utils/file.js';
-import { limit } from '@utils/semaphore.js';
+import { limit, mapAsync } from '@utils';
 import puppeteer, { Page } from 'puppeteer';
+import { Cache } from '../cache.js';
 
 export interface Coffee {
   country: string | 'N/A';
@@ -107,14 +106,15 @@ export class CoffeeShopBase {
       .filter((p) => p)
       .sort((a, b) => a.price - b.price);
 
-    const lastCache = (await retrieveCache(this.constructor.name)) ?? [];
+    const cache = new Cache();
+    const lastCache = (await cache.get<Coffee[]>(this.constructor.name)) ?? [];
 
     const productsWithNewFlag = products.map((product) => ({
       ...product,
       new: !lastCache.some(({ url }) => product.url === url),
     }));
 
-    await cacheProducts(this.constructor.name, products);
+    await cache.set(this.constructor.name, products);
 
     return productsWithNewFlag;
   }

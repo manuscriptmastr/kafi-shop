@@ -4,7 +4,7 @@ import {
   Metadata,
   Size,
 } from '@models/coffee.js';
-import { capitalize } from '@utils/data.js';
+import { capitalize } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
