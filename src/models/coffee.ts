@@ -28,7 +28,7 @@ export interface CoffeeShopProperties {
   getProducts: (metadata: Metadata) => Promise<CoffeeWithNewFlag[]>;
   getUrls: (page: Page, metadata: Metadata) => Promise<string[]>;
   setupProductPage?: (page: Page, metadata: Metadata) => Promise<void>;
-  shouldSkipProductPage: (page: Page, metadata: Metadata) => Promise<boolean>;
+  shouldSkipProductPage?: (page: Page, metadata: Metadata) => Promise<boolean>;
 }
 
 export enum Size {
@@ -41,7 +41,9 @@ export enum Size {
   FourOunces = '4oz',
   FiveOunces = '5oz',
   TenOunces = '10oz',
+  TwelveOunces = '12oz',
   TwoPounds = '2lb',
+  TwoAndAHalfPounds = '2.5lb',
   FivePounds = '5lb',
 }
 
@@ -66,8 +68,11 @@ export class CoffeeShopBase {
         await page.goto(url);
         await page.waitForNetworkIdle();
 
-        // @ts-ignore
-        if (await this.shouldSkipProductPage(page, metadata)) {
+        if (
+          'shouldSkipProductPage' in this &&
+          // @ts-ignore
+          (await this.shouldSkipProductPage(page, metadata))
+        ) {
           page.close();
           return null;
         }

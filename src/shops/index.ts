@@ -1,3 +1,4 @@
+import { Blanchards } from './blanchards.js';
 import { CoffeaCirculor } from './coffea-circulor.js';
 import { Manhattan } from './manhattan.js';
 import { Onyx } from './onyx.js';
@@ -5,6 +6,7 @@ import { Passenger } from './passenger.js';
 import { Sey } from './sey.js';
 
 export enum Shop {
+  Blanchards = 'blanchards',
   CoffeaCirculor = 'coffea-circulor',
   Manhattan = 'manhattan',
   Onyx = 'onyx',
@@ -13,6 +15,7 @@ export enum Shop {
 }
 
 export const SHOPS = {
+  [Shop.Blanchards]: Blanchards,
   [Shop.CoffeaCirculor]: CoffeaCirculor,
   [Shop.Manhattan]: Manhattan,
   [Shop.Onyx]: Onyx,
