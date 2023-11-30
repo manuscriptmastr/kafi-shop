@@ -40,6 +40,7 @@ export enum Size {
   OneKilogram = '1kg',
   FourOunces = '4oz',
   FiveOunces = '5oz',
+  EightOunces = '8oz',
   TenOunces = '10oz',
   TwelveOunces = '12oz',
   TwoPounds = '2lb',
@@ -64,44 +65,49 @@ export class CoffeeShopBase {
     const unfilteredProducts: Coffee[] = await mapAsync(
       urls,
       limit(10, async (url: string): Promise<Coffee | null> => {
-        const page = await browser.newPage();
-        await page.goto(url);
-        await page.waitForNetworkIdle();
+        try {
+          const page = await browser.newPage();
+          await page.goto(url);
+          await page.waitForNetworkIdle();
 
-        if (
-          'shouldSkipProductPage' in this &&
-          // @ts-ignore
-          (await this.shouldSkipProductPage(page, metadata))
-        ) {
-          page.close();
-          return null;
+          if (
+            'shouldSkipProductPage' in this &&
+            // @ts-ignore
+            (await this.shouldSkipProductPage(page, metadata))
+          ) {
+            page.close();
+            return null;
+          }
+
+          if ('setupProductPage' in this) {
+            // @ts-ignore
+            await this.setupProductPage(page, metadata);
+          }
+
+          const [name, country, tastingNotes, price, cuppingScore] =
+            await Promise.all([
+              // @ts-ignore
+              this.getName(page, metadata),
+              'getCountry' in this
+                ? // @ts-ignore
+                  this.getCountry(page, metadata)
+                : ('N/A' as const),
+              // @ts-ignore
+              this.getTastingNotes(page, metadata),
+              // @ts-ignore
+              this.getPrice(page, metadata),
+              'getCuppingScore' in this
+                ? // @ts-ignore
+                  this.getCuppingScore(page, metadata)
+                : ('N/A' as const),
+            ]);
+
+          await page.close();
+          return { name, country, tastingNotes, price, cuppingScore, url };
+        } catch (e) {
+          console.error(url);
+          throw e;
         }
-
-        if ('setupProductPage' in this) {
-          // @ts-ignore
-          await this.setupProductPage(page, metadata);
-        }
-
-        const [name, country, tastingNotes, price, cuppingScore] =
-          await Promise.all([
-            // @ts-ignore
-            this.getName(page, metadata),
-            'getCountry' in this
-              ? // @ts-ignore
-                this.getCountry(page, metadata)
-              : ('N/A' as const),
-            // @ts-ignore
-            this.getTastingNotes(page, metadata),
-            // @ts-ignore
-            this.getPrice(page, metadata),
-            'getCuppingScore' in this
-              ? // @ts-ignore
-                this.getCuppingScore(page, metadata)
-              : ('N/A' as const),
-          ]);
-
-        await page.close();
-        return { name, country, tastingNotes, price, cuppingScore, url };
       }),
     );
 

@@ -1,7 +1,44 @@
+import { ElementHandle, Page } from 'puppeteer';
+
+export const autoScroll = async (page: Page) => {
+  await page.evaluate(async () => {
+    await new Promise((resolve) => {
+      var totalHeight = 0;
+      var distance = 100;
+      var timer = setInterval(() => {
+        var scrollHeight = document.body.scrollHeight;
+        window.scrollBy(0, distance);
+        totalHeight += distance;
+
+        if (totalHeight >= scrollHeight - window.innerHeight) {
+          clearInterval(timer);
+          resolve(undefined);
+        }
+      }, 100);
+    });
+  });
+};
+
 export const capitalize = (str: string) => {
   const prefix = str.slice(0, 1);
   const suffix = str.slice(1);
   return `${prefix.toUpperCase()}${suffix}`;
+};
+
+export const clickOnElementManually = async (
+  page: Page,
+  elem: ElementHandle,
+) => {
+  const rect = await page.evaluate((el) => {
+    const { top, left, width, height } = el.getBoundingClientRect();
+    return { top, left, width, height };
+  }, elem);
+
+  // Use given position or default to center
+  const x = rect.width / 2;
+  const y = rect.height / 2;
+
+  await page.mouse.click(rect.left + x, rect.top + y);
 };
 
 export let limit = <T extends (...args: any[]) => any>(max: number, fn: T) => {

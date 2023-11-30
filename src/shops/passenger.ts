@@ -77,9 +77,12 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
       '#mainContent a.w-full[href^="/products/"]',
       (anchors: HTMLAnchorElement[]) =>
         anchors
-          .filter((a) => !/instant/gi.test(a.textContent!))
-          .filter((a) => !/set/gi.test(a.textContent!))
-          .filter((a) => !/necessary/gi.test(a.textContent!))
+          .filter(
+            (a) =>
+              ![/necessary/i, /instant/i, /set/i, /subscription/i].some((str) =>
+                a.textContent!.trim().match(str),
+              ),
+          )
           .map((a) => a.href),
     );
   }
