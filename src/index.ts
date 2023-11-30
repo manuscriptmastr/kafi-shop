@@ -7,7 +7,6 @@ import { hideBin } from 'yargs/helpers';
 
 /**
  * @todo Dynamically determine size option default + choices from shop positional
- * @todo Add `new` property to coffees for "git diff"-style templating
  */
 
 interface UserInput {
