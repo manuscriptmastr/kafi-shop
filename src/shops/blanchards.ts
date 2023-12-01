@@ -17,7 +17,7 @@ export class Blanchards extends CoffeeShopBase implements CoffeeShopProperties {
   };
   static url = 'https://blanchardscoffee.com';
 
-  async getCountry(page: Page) {
+  async getOrigin(page: Page) {
     const anchor = await page.$('span.brand a');
     if (anchor) {
       return page.$eval('span.brand a', (a: HTMLAnchorElement) =>

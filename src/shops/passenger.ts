@@ -20,7 +20,7 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
   };
   static url = 'https://www.passengercoffee.com';
 
-  async getCountry(page: Page) {
+  async getOrigin(page: Page) {
     const country = await page.$eval(
       '#mainContent .max-w-content .block.leading-none',
       (dd) => dd.textContent!.trim(),

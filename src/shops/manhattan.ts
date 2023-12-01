@@ -20,7 +20,7 @@ export class Manhattan extends CoffeeShopBase implements CoffeeShopProperties {
   };
   static url = 'https://manhattancoffeeroasters.com';
 
-  async getCountry(page: Page) {
+  async getOrigin(page: Page) {
     const country = await page.$eval('::-p-text(origin)', (el) =>
       el
         .parentElement!.parentElement!.querySelector('li.overflow-hidden')!

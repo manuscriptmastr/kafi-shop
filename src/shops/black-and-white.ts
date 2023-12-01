@@ -21,7 +21,7 @@ export class BlackAndWhite
   };
   static url = 'https://www.blackwhiteroasters.com';
 
-  async getCountry(page: Page) {
+  async getOrigin(page: Page) {
     const singleOrigin = await page.$('strong::-p-text(Origin |)');
     const multipleOrigins = await page.$('strong::-p-text(Origins |)');
     const origin = singleOrigin || multipleOrigins;

@@ -18,7 +18,7 @@ export class Sey extends CoffeeShopBase implements CoffeeShopProperties {
   };
   static url = 'https://www.seycoffee.com';
 
-  async getCountry(page: Page) {
+  async getOrigin(page: Page) {
     return page.$eval('span.coffeeTitle_country', (span: HTMLSpanElement) =>
       span.textContent!.trim(),
     );

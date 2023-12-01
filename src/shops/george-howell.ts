@@ -22,7 +22,7 @@ export class GeorgeHowell
   };
   static url = 'https://georgehowellcoffee.com';
 
-  async getCountry(page: Page) {
+  async getOrigin(page: Page) {
     const country = await page.$('text/COUNTRY');
     if (country) {
       return country.evaluate((el) =>

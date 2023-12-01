@@ -21,7 +21,7 @@ export class CoffeaCirculor
   };
   static url = 'https://coffeacirculor.com';
 
-  async getCountry(page: Page) {
+  async getOrigin(page: Page) {
     return page.$eval('text/Country', (el) =>
       el.nextElementSibling!.textContent!.trim(),
     );

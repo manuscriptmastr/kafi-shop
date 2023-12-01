@@ -22,7 +22,7 @@ export interface Metadata {
 export interface CoffeeShopProperties {
   getTastingNotes: (page: Page, metadata: Metadata) => Promise<string[]>;
   getName: (page: Page, metadata: Metadata) => Promise<string>;
-  getCountry?: (page: Page, metadata: Metadata) => Promise<string>;
+  getOrigin?: (page: Page, metadata: Metadata) => Promise<string>;
   getCuppingScore?: (page: Page, metadata: Metadata) => Promise<number>;
   getPrice: (page: Page, metadata: Metadata) => Promise<number>;
   getProducts: (metadata: Metadata) => Promise<CoffeeWithNewFlag[]>;
@@ -88,9 +88,9 @@ export class CoffeeShopBase {
             await Promise.all([
               // @ts-ignore
               this.getName(page, metadata),
-              'getCountry' in this
+              'getOrigin' in this
                 ? // @ts-ignore
-                  this.getCountry(page, metadata)
+                  this.getOrigin(page, metadata)
                 : ('N/A' as const),
               // @ts-ignore
               this.getTastingNotes(page, metadata),
