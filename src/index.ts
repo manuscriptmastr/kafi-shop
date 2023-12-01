@@ -7,6 +7,9 @@ import { hideBin } from 'yargs/helpers';
 
 /**
  * @todo Dynamically determine size option default + choices from shop positional
+ * @todo shouldSkipProductPage() and getPrice() overlap signficantly. What if any get{\w+}() could throw an error that would cause skipping?
+ * @todo Use a plain function for getProducts() instead of extended class.
+ * @todo country => origin
  */
 
 interface UserInput {

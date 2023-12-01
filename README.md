@@ -2,6 +2,7 @@
 
 Node.js shopping CLI for specialty coffee. Currently supports:
 
+- [Black & White Coffee](https://www.blackwhiteroasters.com/)
 - [Blanchard's Coffee](https://blanchardscoffee.com/)
 - [Ceremony Coffee Roasters](https://shop.ceremonycoffee.com/)
 - [Coffea Circulor](https://coffeacirculor.com/)
@@ -28,7 +29,7 @@ chmod +x ./dist/index.js
 ## CLI
 
 ```shell
-npm run shop <blanchards|ceremony|coffea-circulor|george-howell|manhattan|onyx|passenger|sey> [size] [template]
+npm run shop <black-and-white|blanchards|ceremony|coffea-circulor|george-howell|manhattan|onyx|passenger|sey> [size] [template]
 ```
 
 `npm run shop sey --size 250g --template markdown` generates:
