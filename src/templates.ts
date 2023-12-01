@@ -22,8 +22,8 @@ export const markdownTemplate = (
     coffees.length
       ? coffees
           .map(
-            ({ country, name, new: isNew, price, tastingNotes, url }) =>
-              `- [${name} (${country}, ${currency(price).format()})](${url}) ${
+            ({ name, new: isNew, origin, price, tastingNotes, url }) =>
+              `- [${name} (${origin}, ${currency(price).format()})](${url}) ${
                 isNew ? ' *NEW*' : ''
               }: ${tastingNotes.join(', ')}`,
           )

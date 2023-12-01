@@ -3,9 +3,9 @@ import puppeteer, { Page } from 'puppeteer';
 import { Cache } from '../cache.js';
 
 export interface Coffee {
-  country: string | 'N/A';
   cuppingScore: number | 'N/A';
   name: string;
+  origin: string | 'N/A';
   price: number;
   tastingNotes: string[];
   url: string;
@@ -84,8 +84,12 @@ export class CoffeeShopBase {
             await this.setupProductPage(page, metadata);
           }
 
-          const [name, country, tastingNotes, price, cuppingScore] =
+          const [cuppingScore, name, origin, price, tastingNotes] =
             await Promise.all([
+              'getCuppingScore' in this
+                ? // @ts-ignore
+                  this.getCuppingScore(page, metadata)
+                : ('N/A' as const),
               // @ts-ignore
               this.getName(page, metadata),
               'getOrigin' in this
@@ -93,17 +97,13 @@ export class CoffeeShopBase {
                   this.getOrigin(page, metadata)
                 : ('N/A' as const),
               // @ts-ignore
-              this.getTastingNotes(page, metadata),
-              // @ts-ignore
               this.getPrice(page, metadata),
-              'getCuppingScore' in this
-                ? // @ts-ignore
-                  this.getCuppingScore(page, metadata)
-                : ('N/A' as const),
+              // @ts-ignore
+              this.getTastingNotes(page, metadata),
             ]);
 
           await page.close();
-          return { name, country, tastingNotes, price, cuppingScore, url };
+          return { cuppingScore, name, origin, price, tastingNotes, url };
         } catch (e) {
           console.error(url);
           throw e;

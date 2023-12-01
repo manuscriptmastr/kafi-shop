@@ -21,11 +21,11 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
   static url = 'https://www.passengercoffee.com';
 
   async getOrigin(page: Page) {
-    const country = await page.$eval(
+    const origin = await page.$eval(
       '#mainContent .max-w-content .block.leading-none',
       (dd) => dd.textContent!.trim(),
     );
-    return capitalize(country);
+    return capitalize(origin);
   }
 
   async getName(page: Page) {
