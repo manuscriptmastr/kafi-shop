@@ -28,7 +28,6 @@ export interface CoffeeShopProperties {
   getProducts: (metadata: Metadata) => Promise<CoffeeWithNewFlag[]>;
   getUrls: (page: Page, metadata: Metadata) => Promise<string[]>;
   setupProductPage?: (page: Page, metadata: Metadata) => Promise<void>;
-  shouldSkipProductPage?: (page: Page, metadata: Metadata) => Promise<boolean>;
 }
 
 export enum Size {
@@ -77,15 +76,6 @@ export class CoffeeShopBase {
         const context = await browser.createIncognitoBrowserContext();
         const page = await context.newPage();
         await page.goto(url, { waitUntil: 'networkidle2' });
-
-        if (
-          'shouldSkipProductPage' in this &&
-          // @ts-ignore
-          (await this.shouldSkipProductPage(page, metadata))
-        ) {
-          await context.close();
-          return null;
-        }
 
         if ('setupProductPage' in this) {
           try {
