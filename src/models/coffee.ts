@@ -1,4 +1,4 @@
-import { limit, mapAsync } from '@utils';
+import { SkipError, limit, mapAsync } from '@utils';
 import puppeteer, { Page } from 'puppeteer';
 import { Cache } from '../cache.js';
 
@@ -88,8 +88,17 @@ export class CoffeeShopBase {
         }
 
         if ('setupProductPage' in this) {
-          // @ts-ignore
-          await this.setupProductPage(page, metadata);
+          try {
+            // @ts-ignore
+            await this.setupProductPage(page, metadata);
+          } catch (e) {
+            if (e instanceof SkipError) {
+              await context.close();
+              return null;
+            } else {
+              throw e;
+            }
+          }
         }
 
         const pageResults = await Promise.allSettled([

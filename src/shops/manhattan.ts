@@ -4,7 +4,7 @@ import {
   Metadata,
   Size,
 } from '@models/coffee.js';
-import { capitalize } from '@utils';
+import { SkipError, capitalize } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
@@ -65,11 +65,12 @@ export class Manhattan extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async setupProductPage(page: Page) {
-    const filterButton = (await page.$('button::-p-text(Filter)'))!;
-    await filterButton.click();
-  }
+    const filterButton = await page.$('button::-p-text(Filter)');
 
-  async shouldSkipProductPage(page: Page) {
-    return !(await page.$('button::-p-text(Filter)'));
+    if (!filterButton) {
+      throw new SkipError('Filter option does not exist');
+    } else {
+      await filterButton.click();
+    }
   }
 }

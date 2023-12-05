@@ -4,7 +4,7 @@ import {
   Metadata,
   Size,
 } from '@models/coffee.js';
-import { autoScroll, clickOnElementManually } from '@utils';
+import { SkipError, autoScroll, clickOnElementManually } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
@@ -45,7 +45,10 @@ export class GeorgeHowell
     const option2 = await page.$(
       `#SingleOptionSelector-0-dropdown li[value="${size}"]`,
     );
-    const li = (option1 || option2)!;
+    const li = option1 || option2;
+    if (!li) {
+      throw new SkipError(`Size "${GeorgeHowell.sizes[size]}" does not exist`);
+    }
     await clickOnElementManually(page, li);
     const price = await page.$eval(
       '#ProductPrice span.money',
@@ -75,15 +78,5 @@ export class GeorgeHowell
           )
           .map((a) => a.href),
     );
-  }
-
-  async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    const option1 = await page.$(
-      `#SingleOptionSelector-0-dropdown li[value="${GeorgeHowell.sizes[size]}"]`,
-    );
-    const option2 = await page.$(
-      `#SingleOptionSelector-0-dropdown li[value="${size}"]`,
-    );
-    return !(option1 || option2);
   }
 }

@@ -4,6 +4,7 @@ import {
   Metadata,
   Size,
 } from '@models/coffee.js';
+import { SkipError } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
@@ -30,9 +31,13 @@ export class Onyx extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async getPrice(page: Page, { size }: Metadata) {
-    const option = (await page.$(
+    const option = await page.$(
       `span.generic-option[data-value="${Onyx.sizes[size]}"]`,
-    ))!;
+    );
+
+    if (!option) {
+      throw new SkipError(`Size "${Onyx.sizes[size]}" does not exist`);
+    }
 
     await option.click();
 
@@ -57,11 +62,5 @@ export class Onyx extends CoffeeShopBase implements CoffeeShopProperties {
       'a.product-preview[href^="/products/"]',
       (anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href),
     );
-  }
-
-  async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    return !(await page.$(
-      `span.generic-option[data-value="${Onyx.sizes[size]}"]`,
-    ));
   }
 }

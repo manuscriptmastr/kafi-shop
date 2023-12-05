@@ -4,6 +4,7 @@ import {
   Metadata,
   Size,
 } from '@models/coffee.js';
+import { SkipError } from '@utils';
 import { Page } from 'puppeteer';
 
 export class CoffeaCirculor
@@ -63,7 +64,11 @@ export class CoffeaCirculor
       }
     }
 
-    return Math.min(...prices);
+    if (prices.length) {
+      return Math.min(...prices);
+    } else {
+      throw new SkipError(`Size "${CoffeaCirculor.sizes[size]}" is sold out`);
+    }
   }
 
   async getTastingNotes(page: Page) {
@@ -90,31 +95,5 @@ export class CoffeaCirculor
       'a.product-item:not(:has(.sold))',
       (anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href),
     );
-  }
-
-  async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    const sizes = await page.$$(
-      `[data-text^="${CoffeaCirculor.sizes[size]}"] span`,
-    );
-
-    const prices = [];
-
-    for (const size of sizes) {
-      await size.click();
-      const isAddToCartDisabled = await page.$eval(
-        'button[name="add"]',
-        (button) => button.disabled,
-      );
-      if (!isAddToCartDisabled) {
-        const price = await page.$eval(
-          'span.product-price',
-          (el) => +el.textContent!.slice(1).replace(',', '') / 100,
-        );
-
-        prices.push(price);
-      }
-    }
-
-    return !prices.length;
   }
 }
