@@ -55,62 +55,82 @@ export class CoffeeShopBase {
   ) {
     const metadata = { size };
 
-    const browser = await puppeteer.launch({ headless: 'new' });
+    /**
+     * - The 'new' headless mode is currently flaky when batch scraping pages.
+     * Using the old headless mode (designated by `true`) causes a warning to show
+     * but works consistently with parallel scraping.
+     * - The `--enable-resource-load-scheduler=false` flag lets pages load in parallel.
+     */
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--enable-resource-load-scheduler=false'],
+    });
     const page = await browser.newPage();
 
     // @ts-ignore
     const urls = await this.getUrls(page, metadata);
     await page.close();
 
-    const unfilteredProducts: Coffee[] = await mapAsync(
-      urls,
-      limit(10, async (url: string): Promise<Coffee | null> => {
-        try {
-          const page = await browser.newPage();
-          await page.goto(url);
-          await page.waitForNetworkIdle();
+    const getProductFromPage = limit(
+      10,
+      async (url: string): Promise<Coffee | null> => {
+        const context = await browser.createIncognitoBrowserContext();
+        const page = await context.newPage();
+        await page.goto(url, { waitUntil: 'networkidle2' });
 
-          if (
-            'shouldSkipProductPage' in this &&
-            // @ts-ignore
-            (await this.shouldSkipProductPage(page, metadata))
-          ) {
-            page.close();
-            return null;
-          }
-
-          if ('setupProductPage' in this) {
-            // @ts-ignore
-            await this.setupProductPage(page, metadata);
-          }
-
-          const [cuppingScore, name, origin, price, tastingNotes] =
-            await Promise.all([
-              'getCuppingScore' in this
-                ? // @ts-ignore
-                  this.getCuppingScore(page, metadata)
-                : ('N/A' as const),
-              // @ts-ignore
-              this.getName(page, metadata),
-              'getOrigin' in this
-                ? // @ts-ignore
-                  this.getOrigin(page, metadata)
-                : ('N/A' as const),
-              // @ts-ignore
-              this.getPrice(page, metadata),
-              // @ts-ignore
-              this.getTastingNotes(page, metadata),
-            ]);
-
-          await page.close();
-          return { cuppingScore, name, origin, price, tastingNotes, url };
-        } catch (e) {
-          console.error(url);
-          throw e;
+        if (
+          'shouldSkipProductPage' in this &&
+          // @ts-ignore
+          (await this.shouldSkipProductPage(page, metadata))
+        ) {
+          await context.close();
+          return null;
         }
-      }),
+
+        if ('setupProductPage' in this) {
+          // @ts-ignore
+          await this.setupProductPage(page, metadata);
+        }
+
+        const pageResults = await Promise.allSettled([
+          'getCuppingScore' in this
+            ? // @ts-ignore
+              this.getCuppingScore(page, metadata)
+            : ('N/A' as const),
+          // @ts-ignore
+          this.getName(page, metadata),
+          'getOrigin' in this
+            ? // @ts-ignore
+              this.getOrigin(page, metadata)
+            : ('N/A' as const),
+          // @ts-ignore
+          this.getPrice(page, metadata),
+          // @ts-ignore
+          this.getTastingNotes(page, metadata),
+        ]);
+
+        if (pageResults.some(({ status }) => status === 'rejected')) {
+          await context.close();
+          return null;
+        }
+
+        const [cuppingScore, name, origin, price, tastingNotes] =
+          // @ts-ignore
+          pageResults.map((r) => r.value);
+
+        await context.close();
+        return {
+          cuppingScore,
+          name,
+          origin,
+          price,
+          tastingNotes,
+          url,
+        };
+      },
     );
 
+    const unfilteredProducts = await mapAsync(urls, getProductFromPage);
     await browser.close();
 
     const products = unfilteredProducts

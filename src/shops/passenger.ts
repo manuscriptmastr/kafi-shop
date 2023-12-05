@@ -4,7 +4,7 @@ import {
   Metadata,
   Size,
 } from '@models/coffee.js';
-import { capitalize } from '@utils';
+import { SkipError, capitalize } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
@@ -36,9 +36,18 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async getPrice(page: Page, { size }: Metadata) {
-    const option = (await page.$(`text/${Passenger.sizes[size]}`))!;
+    const option = await page.$(`text/${Passenger.sizes[size]}`);
+    if (!option) {
+      throw new SkipError(`Size "${Passenger.sizes[size]}" does not exist`);
+    }
+
     await option.click();
     await page.waitForNetworkIdle();
+
+    if (await page.$('text/Currently Unavailable')) {
+      throw new SkipError(`Size "${Passenger.sizes[size]}" is sold out`);
+    }
+
     const priceText = await page.$eval(
       `#mainContent .max-w-content span::-p-text($)`,
       (span: HTMLSpanElement) => span.textContent!.trim(),
@@ -85,22 +94,5 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
           )
           .map((a) => a.href),
     );
-  }
-
-  async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    const option = await page.$(`text/${Passenger.sizes[size]}`);
-
-    if (!option) {
-      return true;
-    }
-
-    await option.click();
-    await page.waitForNetworkIdle();
-
-    if (await page.$('text/Currently Unavailable')) {
-      return true;
-    }
-
-    return false;
   }
 }

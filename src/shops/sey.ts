@@ -4,6 +4,7 @@ import {
   Metadata,
   Size,
 } from '@models/coffee.js';
+import { SkipError } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
@@ -32,6 +33,14 @@ export class Sey extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async getPrice(page: Page, { size }: Metadata) {
+    if (
+      !(await page.$('select')) ||
+      !!(await page.$(`option::-p-text(${Sey.sizes[size]} - Sold Out)`))
+    ) {
+      throw new SkipError(
+        `Size "${Sey.sizes[size]}" is sold out or does not exist`,
+      );
+    }
     const priceString = await page.$eval(
       `option::-p-text(${Sey.sizes[size]})`,
       (option: HTMLOptionElement) =>
@@ -62,14 +71,18 @@ export class Sey extends CoffeeShopBase implements CoffeeShopProperties {
     await page.goto(`${Sey.url}/collections/coffee`);
     return page.$$eval(
       'div.coffees_products_product_inner > a',
-      (anchors: HTMLAnchorElement[]) => anchors.map(({ href }) => href),
-    );
-  }
-
-  async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    return (
-      !(await page.$('select')) ||
-      !!(await page.$(`option::-p-text(${Sey.sizes[size]} - Sold Out)`))
+      (anchors: HTMLAnchorElement[]) =>
+        anchors
+          .filter(
+            (a) =>
+              ![/instant/i, /set/i, /subscription/i].some((str) =>
+                a
+                  .querySelector('span.coffeeTitle_producer')!
+                  .textContent!.trim()
+                  .match(str),
+              ),
+          )
+          .map(({ href }) => href),
     );
   }
 }

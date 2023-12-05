@@ -4,6 +4,7 @@ import {
   Metadata,
   Size,
 } from '@models/coffee.js';
+import { SkipError } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
@@ -37,9 +38,23 @@ export class BlackAndWhite
   }
 
   async getPrice(page: Page, { size }: Metadata) {
-    await page.click(
+    const option = await page.$(
       `span.opt-label__text::-p-text(${BlackAndWhite.sizes[size]})`,
     );
+    if (!option) {
+      throw new SkipError(`Size "${BlackAndWhite.sizes[size]}" does not exist`);
+    }
+    await option.click();
+    const submitButton = (await page.$(
+      'form .quantity-submit-row button[type="submit"]',
+    ))!;
+    if (
+      await submitButton.evaluate((button) =>
+        button.textContent!.trim().match(/sold out/i),
+      )
+    ) {
+      throw new SkipError(`Size "${BlackAndWhite.sizes[size]}" is sold out`);
+    }
     const price = await page.$eval(
       'div.ss-bottomless-variant-price',
       (div: HTMLDivElement) => div.textContent!.trim(),
@@ -84,24 +99,5 @@ export class BlackAndWhite
     }
 
     return urls;
-  }
-
-  async shouldSkipProductPage(page: Page, { size }: Metadata) {
-    const option = await page.$(
-      `span.opt-label__text::-p-text(${BlackAndWhite.sizes[size]})`,
-    );
-    if (!option) {
-      return true;
-    }
-    await option.click();
-    const submitButton = (await page.$('form button[type="submit"]'))!;
-    if (
-      await submitButton.evaluate((button) =>
-        button.textContent!.trim().match(/sold out/i),
-      )
-    ) {
-      return true;
-    }
-    return false;
   }
 }

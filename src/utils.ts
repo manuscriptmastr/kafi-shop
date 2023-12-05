@@ -64,7 +64,7 @@ export let limit = <T extends (...args: any[]) => any>(max: number, fn: T) => {
     const acquire = () =>
       new Promise((resolve) => {
         tasks.push(resolve);
-        setImmediate(dispatch);
+        dispatch();
       });
 
     return async (fn: T) => {
@@ -87,3 +87,10 @@ export let limit = <T extends (...args: any[]) => any>(max: number, fn: T) => {
 
 export const mapAsync = async <T, U>(list: T[], fn: (item: T) => Promise<U>) =>
   Promise.all(list.map(fn));
+
+export class SkipError extends Error {
+  constructor(reason?: string) {
+    super(reason);
+    this.name = 'SkipError';
+  }
+}
