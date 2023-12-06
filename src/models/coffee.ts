@@ -1,4 +1,4 @@
-import { SkipError, limit, mapAsync } from '@utils';
+import { limit, mapAsync } from '@utils';
 import puppeteer, { Page } from 'puppeteer';
 import { Cache } from '../cache.js';
 
@@ -27,7 +27,6 @@ export interface CoffeeShopProperties {
   getPrice: (page: Page, metadata: Metadata) => Promise<number>;
   getProducts: (metadata: Metadata) => Promise<CoffeeWithNewFlag[]>;
   getUrls: (page: Page, metadata: Metadata) => Promise<string[]>;
-  setupProductPage?: (page: Page, metadata: Metadata) => Promise<void>;
 }
 
 export enum Size {
@@ -76,20 +75,6 @@ export class CoffeeShopBase {
         const context = await browser.createIncognitoBrowserContext();
         const page = await context.newPage();
         await page.goto(url, { waitUntil: 'networkidle2' });
-
-        if ('setupProductPage' in this) {
-          try {
-            // @ts-ignore
-            await this.setupProductPage(page, metadata);
-          } catch (e) {
-            if (e instanceof SkipError) {
-              await context.close();
-              return null;
-            } else {
-              throw e;
-            }
-          }
-        }
 
         const pageResults = await Promise.allSettled([
           'getCuppingScore' in this

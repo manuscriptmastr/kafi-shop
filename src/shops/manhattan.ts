@@ -34,6 +34,14 @@ export class Manhattan extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async getPrice(page: Page, { size }: Metadata) {
+    const filterButton = await page.$('button::-p-text(Filter)');
+
+    if (!filterButton) {
+      throw new SkipError('Filter option does not exist');
+    } else {
+      await filterButton.click();
+    }
+
     const priceText = await page.$eval(
       `::-p-text(${Manhattan.sizes[size]} whole coffee beans)`,
       (el) =>
@@ -62,15 +70,5 @@ export class Manhattan extends CoffeeShopBase implements CoffeeShopProperties {
       `a[href^="${Manhattan.url}/catalog/coffee/"]`,
       (anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href),
     );
-  }
-
-  async setupProductPage(page: Page) {
-    const filterButton = await page.$('button::-p-text(Filter)');
-
-    if (!filterButton) {
-      throw new SkipError('Filter option does not exist');
-    } else {
-      await filterButton.click();
-    }
   }
 }
