@@ -3,6 +3,7 @@ import { Blanchards } from './blanchards.js';
 import { Ceremony } from './ceremony.js';
 import { CoffeaCirculor } from './coffea-circulor.js';
 import { GeorgeHowell } from './george-howell.js';
+import { Luna } from './luna.js';
 import { Manhattan } from './manhattan.js';
 import { Onyx } from './onyx.js';
 import { Passenger } from './passenger.js';
@@ -14,6 +15,7 @@ export enum Shop {
   Ceremony = 'ceremony',
   CoffeaCirculor = 'coffea-circulor',
   GeorgeHowell = 'george-howell',
+  Luna = 'luna',
   Manhattan = 'manhattan',
   Onyx = 'onyx',
   Passenger = 'passenger',
@@ -26,6 +28,7 @@ export const SHOPS = {
   [Shop.Ceremony]: Ceremony,
   [Shop.CoffeaCirculor]: CoffeaCirculor,
   [Shop.GeorgeHowell]: GeorgeHowell,
+  [Shop.Luna]: Luna,
   [Shop.Manhattan]: Manhattan,
   [Shop.Onyx]: Onyx,
   [Shop.Passenger]: Passenger,
