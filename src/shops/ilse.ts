@@ -41,7 +41,7 @@ export class Ilse extends CoffeeShopBase implements CoffeeShopProperties {
       (options: HTMLOptionElement[]) => options.map((o) => o.value),
     );
     if (!options.includes(size)) {
-      throw new SkipError(`Size "${Ilse.sizes[size]}" is not available.`);
+      throw new SkipError(`Size "${Ilse.sizes[size]}" does not exist.`);
     }
     await select.select(Ilse.sizes[size]!);
     const price = await page.$eval(

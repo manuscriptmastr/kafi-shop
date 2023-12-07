@@ -6,6 +6,7 @@ import { GeorgeHowell } from './george-howell.js';
 import { Ilse } from './ilse.js';
 import { Luna } from './luna.js';
 import { Manhattan } from './manhattan.js';
+import { Monogram } from './monogram.js';
 import { Onyx } from './onyx.js';
 import { Passenger } from './passenger.js';
 import { Sey } from './sey.js';
@@ -19,6 +20,7 @@ export enum Shop {
   Ilse = 'ilse',
   Luna = 'luna',
   Manhattan = 'manhattan',
+  Monogram = 'monogram',
   Onyx = 'onyx',
   Passenger = 'passenger',
   Sey = 'sey',
@@ -33,6 +35,7 @@ export const SHOPS = {
   [Shop.Ilse]: Ilse,
   [Shop.Luna]: Luna,
   [Shop.Manhattan]: Manhattan,
+  [Shop.Monogram]: Monogram,
   [Shop.Onyx]: Onyx,
   [Shop.Passenger]: Passenger,
   [Shop.Sey]: Sey,

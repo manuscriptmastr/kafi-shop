@@ -10,6 +10,7 @@ Node.js shopping CLI for specialty coffee. Currently supports:
 - [Ilse Coffee](https://ilsecoffee.com/)
 - [Luna](https://enjoylunacoffee.com/)
 - [Manhattan Coffee Roasters](https://manhattancoffeeroasters.com/)
+- [Monogram Coffee](https://monogramcoffee.com/en-us/)
 - [Onyx Coffee Lab](https://onyxcoffeelab.com/)
 - [Passenger](https://www.passengercoffee.com/)
 - [Sey](https://www.seycoffee.com/)
