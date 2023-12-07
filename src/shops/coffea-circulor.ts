@@ -93,7 +93,15 @@ export class CoffeaCirculor
 
     return page.$$eval(
       'a.product-item:not(:has(.sold))',
-      (anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href),
+      (anchors: HTMLAnchorElement[]) =>
+        anchors
+          .filter(
+            (a) =>
+              ![/bag/i, /hyperfood/i, /poster/i, /-set/i, /shirt/i].some(
+                (pattern) => pattern.test(a.href),
+              ),
+          )
+          .map((a) => a.href),
     );
   }
 }

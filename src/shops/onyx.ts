@@ -20,14 +20,25 @@ export class Onyx extends CoffeeShopBase implements CoffeeShopProperties {
   static url = 'https://onyxcoffeelab.com';
 
   async getCuppingScore(page: Page) {
-    return page.$eval(
+    const cupScoreEl = await page.$(
       '[data-name="trans_cup_score"] p::-p-text(Cup Score)',
-      (p) => Number(p.parentElement!.lastElementChild!.textContent!.trim()),
     );
+    if (!cupScoreEl) {
+      return 'N/A';
+    } else {
+      return cupScoreEl.evaluate((p) =>
+        Number(p.parentElement!.lastElementChild!.textContent!.trim()),
+      );
+    }
   }
 
   async getName(page: Page) {
-    return page.$eval('h1', (h1) => h1.firstChild!.textContent!);
+    const name = await page.$('h1');
+    if (name) {
+      return name.evaluate((h1) => h1.firstChild!.textContent!);
+    } else {
+      return 'N/A';
+    }
   }
 
   async getPrice(page: Page, { size }: Metadata) {

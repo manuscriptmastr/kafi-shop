@@ -1,4 +1,4 @@
-import { limit, mapAsync } from '@utils';
+import { SkipError, limit, mapAsync } from '@utils';
 import puppeteer, { Page } from 'puppeteer';
 import { Cache } from '../cache.js';
 
@@ -23,7 +23,7 @@ export interface CoffeeShopProperties {
   getTastingNotes: (page: Page, metadata: Metadata) => Promise<string[]>;
   getName: (page: Page, metadata: Metadata) => Promise<string>;
   getOrigin?: (page: Page, metadata: Metadata) => Promise<string>;
-  getCuppingScore?: (page: Page, metadata: Metadata) => Promise<number>;
+  getCuppingScore?: (page: Page, metadata: Metadata) => Promise<number | 'N/A'>;
   getPrice: (page: Page, metadata: Metadata) => Promise<number>;
   getProducts: (metadata: Metadata) => Promise<CoffeeWithNewFlag[]>;
   getUrls: (page: Page, metadata: Metadata) => Promise<string[]>;
@@ -78,41 +78,40 @@ export class CoffeeShopBase {
         const page = await context.newPage();
         await page.goto(url, { waitUntil: 'networkidle2' });
 
-        const pageResults = await Promise.allSettled([
-          'getCuppingScore' in this
-            ? // @ts-ignore
-              this.getCuppingScore(page, metadata)
-            : ('N/A' as const),
-          // @ts-ignore
-          this.getName(page, metadata),
-          'getOrigin' in this
-            ? // @ts-ignore
-              this.getOrigin(page, metadata)
-            : ('N/A' as const),
-          // @ts-ignore
-          this.getPrice(page, metadata),
-          // @ts-ignore
-          this.getTastingNotes(page, metadata),
-        ]);
+        try {
+          const cuppingScore =
+            'getCuppingScore' in this
+              ? // @ts-ignore
+                await this.getCuppingScore(page, metadata)
+              : ('N/A' as const);
+          const name = await this.getName(page, metadata);
+          const origin =
+            'getOrigin' in this
+              ? // @ts-ignore
+                await this.getOrigin(page, metadata)
+              : ('N/A' as const);
+          const price = await this.getPrice(page, metadata);
+          const tastingNotes = await this.getTastingNotes(page, metadata);
 
-        if (pageResults.some(({ status }) => status === 'rejected')) {
+          return {
+            cuppingScore,
+            name,
+            origin,
+            price,
+            tastingNotes,
+            url,
+          };
+        } catch (e) {
+          if (e instanceof SkipError) {
+            console.log(`Skipping ${url}: ${e.message}`);
+            return null;
+          } else {
+            console.log(url);
+            throw e;
+          }
+        } finally {
           await context.close();
-          return null;
         }
-
-        const [cuppingScore, name, origin, price, tastingNotes] =
-          // @ts-ignore
-          pageResults.map((r) => r.value);
-
-        await context.close();
-        return {
-          cuppingScore,
-          name,
-          origin,
-          price,
-          tastingNotes,
-          url,
-        };
       },
     );
 
