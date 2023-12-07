@@ -6,8 +6,9 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 /**
- * @todo Dynamically determine size option default + choices from shop positional
+ * @todo Dynamically determine size option default + choices from shop positional.
  * @todo Use a plain function for getProducts() instead of extended class.
+ * @todo Scrape all sizes from products, and use size option to filter results.
  */
 
 interface UserInput {
