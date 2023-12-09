@@ -34,14 +34,7 @@ export const markdownTemplate = (
 *[${coffeeShop.name}](${coffeeShop.url})*
 _Note: Prices reflect ${metadata.size} size._
 
-*Low (< $15)*
-${coffeesToList(coffees.filter(({ price }) => price < 15))}
-
-*Mid ($15–$25)*
-${coffeesToList(coffees.filter(({ price }) => price >= 15 && price < 25))}
-
-*Feelin' bougie? ($25–30)*
-${coffeesToList(coffees.filter(({ price }) => price >= 25 && price <= 30))}
+${coffeesToList(coffees.slice(0, 30))}
 
 *${coffeeShop.buyingTip}*
 	`;
