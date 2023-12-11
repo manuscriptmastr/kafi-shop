@@ -10,6 +10,7 @@ import { Page } from 'puppeteer';
 
 export class Ilse extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip = 'Free shipping on orders over $50.';
+  static defaultSize = Size.TwelveOunces;
   static name = 'Ilse Coffee';
   static sizes: Partial<Record<Size, string>> = {
     [Size.OneHundredTwentyFiveGrams]: '125g',

@@ -9,6 +9,7 @@ import { ElementHandle, Page } from 'puppeteer';
 
 export class Ceremony extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip = 'Free shipping on orders of $40 or more.';
+  static defaultSize = Size.TwelveOunces;
   static name = 'Ceremony Coffee Roasters';
   static sizes: Partial<Record<Size, string>> = {
     [Size.TwelveOunces]: '12oz',

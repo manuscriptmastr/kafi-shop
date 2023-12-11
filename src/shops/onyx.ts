@@ -10,6 +10,7 @@ import { Page } from 'puppeteer';
 
 export class Onyx extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip = 'Free shipping on orders of $40 or more.';
+  static defaultSize = Size.TenOunces;
   static name = 'Onyx Coffee Lab';
   static sizes: Partial<Record<Size, string>> = {
     [Size.FourOunces]: '4oz',

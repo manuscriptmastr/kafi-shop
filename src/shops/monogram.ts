@@ -11,6 +11,7 @@ import { Page } from 'puppeteer';
 export class Monogram extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip =
     'Free CA shipping over $50, and free US shipping over $70.';
+  static defaultSize = Size.ThreeHundredGrams;
   static name = 'Monogram Coffee';
   static sizes: Partial<Record<Size, string>> = {
     [Size.TwoHundredGrams]: '200g',

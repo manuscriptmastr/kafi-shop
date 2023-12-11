@@ -10,6 +10,7 @@ import { Page } from 'puppeteer';
 
 export class Luna extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip = 'Free CA/US shipping when you order 1kg or more.';
+  static defaultSize = Size.TwoHundredFiftyGrams;
   static name = 'Luna';
   static sizes: Partial<Record<Size, string>> = {
     [Size.TwoHundredFiftyGrams]: '250g',

@@ -13,6 +13,7 @@ export class CoffeaCirculor
 {
   static buyingTip =
     'Free international shipping (and sample) when you buy 1kg.';
+  static defaultSize = Size.TwoHundredFiftyGrams;
   static name = 'Coffea Circulor';
   static sizes: Partial<Record<Size, string>> = {
     [Size.FortyGrams]: '40g',
@@ -21,12 +22,6 @@ export class CoffeaCirculor
     [Size.OneKilogram]: '1kg',
   };
   static url = 'https://coffeacirculor.com';
-
-  async getOrigin(page: Page) {
-    return page.$eval('text/Country', (el) =>
-      el.nextElementSibling!.textContent!.trim(),
-    );
-  }
 
   async getCuppingScore(page: Page) {
     return Number(
@@ -39,6 +34,12 @@ export class CoffeaCirculor
 
   async getName(page: Page) {
     return page.$eval('h1.product-title', (el) => el.textContent!);
+  }
+
+  async getOrigin(page: Page) {
+    return page.$eval('text/Country', (el) =>
+      el.nextElementSibling!.textContent!.trim(),
+    );
   }
 
   async getPrice(page: Page, { size }: Metadata) {

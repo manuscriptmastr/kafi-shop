@@ -13,6 +13,7 @@ export class GeorgeHowell
   implements CoffeeShopProperties
 {
   static buyingTip = 'Free shipping on orders of $50 or more.';
+  static defaultSize = Size.TwelveOunces;
   static name = 'George Howell Coffee';
   static sizes: Partial<Record<Size, string>> = {
     [Size.EightOunces]: '8 oz',
@@ -21,6 +22,10 @@ export class GeorgeHowell
     [Size.FivePounds]: '5 lb',
   };
   static url = 'https://georgehowellcoffee.com';
+
+  async getName(page: Page) {
+    return page.$eval('h1', (h1: HTMLHeadingElement) => h1.textContent!.trim());
+  }
 
   async getOrigin(page: Page) {
     const origin = await page.$('text/COUNTRY');
@@ -31,10 +36,6 @@ export class GeorgeHowell
     } else {
       return 'N/A';
     }
-  }
-
-  async getName(page: Page) {
-    return page.$eval('h1', (h1: HTMLHeadingElement) => h1.textContent!.trim());
   }
 
   async getPrice(page: Page, { size }: Metadata) {

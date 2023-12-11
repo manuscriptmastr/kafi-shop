@@ -11,6 +11,7 @@ import { Page } from 'puppeteer';
 export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip =
     'Free shipping on orders of $50 or more. Also, consider buying larger bags to drastically reduce overall costs.';
+  static defaultSize = Size.TenOunces;
   static name = 'Passenger Coffee';
   static sizes: Partial<Record<Size, string>> = {
     [Size.FiveOunces]: '5 oz',
@@ -20,19 +21,19 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
   };
   static url = 'https://www.passengercoffee.com';
 
+  async getName(page: Page) {
+    return page.$eval(
+      '#mainContent .max-w-content h2.leading-none span',
+      (span) => span.textContent!.trim(),
+    );
+  }
+
   async getOrigin(page: Page) {
     const origin = await page.$eval(
       '#mainContent .max-w-content .block.leading-none',
       (dd) => dd.textContent!.trim(),
     );
     return capitalize(origin);
-  }
-
-  async getName(page: Page) {
-    return page.$eval(
-      '#mainContent .max-w-content h2.leading-none span',
-      (span) => span.textContent!.trim(),
-    );
   }
 
   async getPrice(page: Page, { size }: Metadata) {

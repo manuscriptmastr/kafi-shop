@@ -13,6 +13,7 @@ export class BlackAndWhite
   implements CoffeeShopProperties
 {
   static buyingTip = 'Free shipping on orders of $35 or more.';
+  static defaultSize = Size.TwelveOunces;
   static name = 'Black & White Coffee';
   static sizes: Partial<Record<Size, string>> = {
     [Size.OneHundredGrams]: '100g',
@@ -21,6 +22,10 @@ export class BlackAndWhite
     [Size.FivePounds]: '5lb',
   };
   static url = 'https://www.blackwhiteroasters.com';
+
+  async getName(page: Page) {
+    return page.$eval('h1', (h1: HTMLHeadingElement) => h1.textContent!.trim());
+  }
 
   async getOrigin(page: Page) {
     const singleOrigin = await page.$('strong::-p-text(Origin |)');
@@ -31,10 +36,6 @@ export class BlackAndWhite
     } else {
       return 'N/A';
     }
-  }
-
-  async getName(page: Page) {
-    return page.$eval('h1', (h1: HTMLHeadingElement) => h1.textContent!.trim());
   }
 
   async getPrice(page: Page, { size }: Metadata) {

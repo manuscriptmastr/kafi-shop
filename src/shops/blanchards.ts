@@ -9,6 +9,7 @@ import { Page } from 'puppeteer';
 
 export class Blanchards extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip = 'Free shipping on orders of $60 or more.';
+  static defaultSize = Size.TwelveOunces;
   static name = "Blanchard's Coffee";
   static sizes: Partial<Record<Size, string>> = {
     [Size.TwelveOunces]: '12 oz',
@@ -16,6 +17,13 @@ export class Blanchards extends CoffeeShopBase implements CoffeeShopProperties {
     [Size.FivePounds]: '5 lb',
   };
   static url = 'https://blanchardscoffee.com';
+
+  async getName(page: Page) {
+    return page.$eval(
+      'h1.product-area__details__title',
+      (h1: HTMLHeadingElement) => h1.textContent!.trim(),
+    );
+  }
 
   async getOrigin(page: Page) {
     const anchor = await page.$('span.brand a');
@@ -26,13 +34,6 @@ export class Blanchards extends CoffeeShopBase implements CoffeeShopProperties {
     } else {
       return 'N/A';
     }
-  }
-
-  async getName(page: Page) {
-    return page.$eval(
-      'h1.product-area__details__title',
-      (h1: HTMLHeadingElement) => h1.textContent!.trim(),
-    );
   }
 
   async getPrice(page: Page, { size }: Metadata) {

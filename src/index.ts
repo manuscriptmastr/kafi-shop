@@ -1,30 +1,25 @@
 #!/usr/bin/env -S node
 import { Size } from '@models/coffee.js';
-import { Shop, SHOPS } from '@shops/index.js';
-import { Template, TEMPLATES } from 'templates.js';
+import { SHOPS, Shop } from '@shops/index.js';
+import { TEMPLATES, Template } from 'templates.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 /**
- * @todo Dynamically determine size option default + choices from shop positional.
  * @todo Use a plain function for getProducts() instead of extended class.
  * @todo Scrape all sizes from products, and use size option to filter results.
  */
 
 interface UserInput {
   shop: Shop;
-  size: Size;
+  size?: Size;
   template: Template;
 }
 
 // @ts-ignore
-const {
-  shop: shopInput,
-  size,
-  template: templateInput,
-}: UserInput = yargs(hideBin(process.argv))
+const input: UserInput = yargs(hideBin(process.argv))
   .scriptName('kafi-shop')
-  .command('$0 <shop> [size] [template]', 'Shop for coffees', (yargs) =>
+  .command('$0 <shop>', 'Shop for coffees', (yargs) =>
     yargs
       .positional('shop', {
         choices: Object.values(Shop),
@@ -32,7 +27,6 @@ const {
       })
       .option('size', {
         choices: Object.values(Size),
-        default: Size.TwoHundredFiftyGrams,
         type: 'string',
       })
       .option('template', {
@@ -43,8 +37,9 @@ const {
   )
   .version(false).argv;
 
-const shop = SHOPS[shopInput];
-const template = TEMPLATES[templateInput];
+const shop = SHOPS[input.shop];
+const template = TEMPLATES[input.template];
+const size = input.size ?? shop.defaultSize;
 
 if (!(size in shop.sizes)) {
   console.error(

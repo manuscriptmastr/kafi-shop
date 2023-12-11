@@ -11,6 +11,7 @@ import { Page } from 'puppeteer';
 export class Manhattan extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip =
     'Free international shipping when you spend 165 euros. Great for small group orders!';
+  static defaultSize = Size.TwoHundredFiftyGrams;
   static name = 'Manhattan Coffee Roasters';
   static sizes: Partial<Record<Size, string>> = {
     [Size.OneHundredTwentyFiveGrams]: '125 gram',
@@ -20,6 +21,10 @@ export class Manhattan extends CoffeeShopBase implements CoffeeShopProperties {
   };
   static url = 'https://manhattancoffeeroasters.com';
 
+  async getName(page: Page) {
+    return page.$eval('h1', (h1) => h1.textContent!.trim());
+  }
+
   async getOrigin(page: Page) {
     const origin = await page.$eval('::-p-text(origin)', (el) =>
       el
@@ -27,10 +32,6 @@ export class Manhattan extends CoffeeShopBase implements CoffeeShopProperties {
         .firstElementChild!.textContent!.trim(),
     );
     return capitalize(origin);
-  }
-
-  async getName(page: Page) {
-    return page.$eval('h1', (h1) => h1.textContent!.trim());
   }
 
   async getPrice(page: Page, { size }: Metadata) {

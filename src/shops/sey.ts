@@ -11,6 +11,7 @@ import { Page } from 'puppeteer';
 export class Sey extends CoffeeShopBase implements CoffeeShopProperties {
   static buyingTip =
     'Try out the monthly subscription for some pretty great savings + free shipping.';
+  static defaultSize = Size.TwoHundredFiftyGrams;
   static name = 'Sey';
   static sizes: Partial<Record<Size, string>> = {
     [Size.TwoHundredFiftyGrams]: '250g',
@@ -19,16 +20,16 @@ export class Sey extends CoffeeShopBase implements CoffeeShopProperties {
   };
   static url = 'https://www.seycoffee.com';
 
-  async getOrigin(page: Page) {
-    return page.$eval('span.coffeeTitle_country', (span: HTMLSpanElement) =>
-      span.textContent!.trim(),
-    );
-  }
-
   async getName(page: Page) {
     return page.$eval(
       'span.coffeeTitle_producer',
       (span: HTMLSpanElement) => span.textContent!,
+    );
+  }
+
+  async getOrigin(page: Page) {
+    return page.$eval('span.coffeeTitle_country', (span: HTMLSpanElement) =>
+      span.textContent!.trim(),
     );
   }
 

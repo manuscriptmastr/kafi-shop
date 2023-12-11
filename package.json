@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "tsc && tsc-alias",
-    "lint": "prettier --write .",
-    "shop": "npm run build && ./dist/index.js"
+    "lint": "prettier --write ."
+  },
+  "bin": {
+    "kafi-shop": "./dist/index.js"
   },
   "author": "Joshua Martin",
   "license": "ISC",
