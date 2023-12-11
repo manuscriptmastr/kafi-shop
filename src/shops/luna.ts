@@ -1,9 +1,4 @@
-import {
-  CoffeeShopBase,
-  CoffeeShopProperties,
-  Metadata,
-  Size,
-} from '@models/coffee.js';
+import { CoffeeShopBase, CoffeeShopProperties, Size } from '@models/coffee.js';
 import { SkipError } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
@@ -28,7 +23,7 @@ export class Luna extends CoffeeShopBase implements CoffeeShopProperties {
     return page.$eval('text/Place:', (el) => el.textContent!.trim());
   }
 
-  async getPrice(page: Page, { size }: Metadata) {
+  async getPrice(page: Page, size: Size) {
     const option = await page.$(`.pdp label::-p-text(${Luna.sizes[size]})`);
     if (!option) {
       throw new SkipError(`Size "${Luna.sizes[size]}" does not exist`);

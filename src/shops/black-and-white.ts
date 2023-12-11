@@ -1,9 +1,4 @@
-import {
-  CoffeeShopBase,
-  CoffeeShopProperties,
-  Metadata,
-  Size,
-} from '@models/coffee.js';
+import { CoffeeShopBase, CoffeeShopProperties, Size } from '@models/coffee.js';
 import { SkipError } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
@@ -38,7 +33,7 @@ export class BlackAndWhite
     }
   }
 
-  async getPrice(page: Page, { size }: Metadata) {
+  async getPrice(page: Page, size: Size) {
     const option = await page.$(
       `span.opt-label__text::-p-text(${BlackAndWhite.sizes[size]})`,
     );

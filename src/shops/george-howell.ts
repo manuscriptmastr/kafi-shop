@@ -1,9 +1,4 @@
-import {
-  CoffeeShopBase,
-  CoffeeShopProperties,
-  Metadata,
-  Size,
-} from '@models/coffee.js';
+import { CoffeeShopBase, CoffeeShopProperties, Size } from '@models/coffee.js';
 import { SkipError, autoScroll, clickOnElementManually } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
@@ -38,7 +33,7 @@ export class GeorgeHowell
     }
   }
 
-  async getPrice(page: Page, { size }: Metadata) {
+  async getPrice(page: Page, size: Size) {
     await page.click('#SingleOptionSelector-0');
     const option1 = await page.$(
       `#SingleOptionSelector-0-dropdown li[value="${GeorgeHowell.sizes[size]}"]`,

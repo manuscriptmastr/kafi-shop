@@ -1,9 +1,4 @@
-import {
-  CoffeeShopBase,
-  CoffeeShopProperties,
-  Metadata,
-  Size,
-} from '@models/coffee.js';
+import { CoffeeShopBase, CoffeeShopProperties, Size } from '@models/coffee.js';
 import { SkipError } from '@utils';
 import { Page } from 'puppeteer';
 
@@ -42,7 +37,7 @@ export class CoffeaCirculor
     );
   }
 
-  async getPrice(page: Page, { size }: Metadata) {
+  async getPrice(page: Page, size: Size) {
     const sizes = await page.$$(
       `[data-text^="${CoffeaCirculor.sizes[size]}"] span`,
     );

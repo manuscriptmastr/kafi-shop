@@ -6,7 +6,7 @@ export interface Coffee {
   cuppingScore: number | 'N/A';
   name: string;
   origin: string | 'N/A';
-  price: number;
+  prices: Partial<Record<Size, number>>;
   tastingNotes: string[];
   url: string;
 }
@@ -15,21 +15,19 @@ export interface CoffeeWithNewFlag extends Coffee {
   new: boolean;
 }
 
-export interface Metadata {
-  size: Size;
-}
-
 export interface CoffeeShopProperties {
-  getTastingNotes: (page: Page, metadata: Metadata) => Promise<string[]>;
-  getName: (page: Page, metadata: Metadata) => Promise<string>;
-  getOrigin?: (page: Page, metadata: Metadata) => Promise<string>;
-  getCuppingScore?: (page: Page, metadata: Metadata) => Promise<number | 'N/A'>;
-  getPrice: (page: Page, metadata: Metadata) => Promise<number>;
-  getProducts: (metadata: Metadata) => Promise<CoffeeWithNewFlag[]>;
-  getUrls: (page: Page, metadata: Metadata) => Promise<string[]>;
+  getTastingNotes: (page: Page) => Promise<string[]>;
+  getName: (page: Page) => Promise<string>;
+  getOrigin?: (page: Page) => Promise<string>;
+  getCuppingScore?: (page: Page) => Promise<number | 'N/A'>;
+  getPrice: (page: Page, size: Size) => Promise<number>;
+  getProducts: () => Promise<CoffeeWithNewFlag[]>;
+  getUrls: (page: Page) => Promise<string[]>;
+  setupProductPage?: (page: Page) => Promise<void>;
 }
 
 export enum Size {
+  None = 'none',
   FortyGrams = '40g',
   OneHundredGrams = '100g',
   OneHundredTwentyFiveGrams = '125g',
@@ -49,12 +47,7 @@ export enum Size {
 }
 
 export class CoffeeShopBase {
-  async getProducts(
-    this: CoffeeShopBase & CoffeeShopProperties,
-    { size }: Metadata,
-  ) {
-    const metadata = { size };
-
+  async getProducts(this: CoffeeShopBase & CoffeeShopProperties) {
     /**
      * - The 'new' headless mode is currently flaky when batch scraping pages.
      * Using the old headless mode (designated by `true`) causes a warning to show
@@ -68,7 +61,7 @@ export class CoffeeShopBase {
     const page = await browser.newPage();
 
     // @ts-ignore
-    const urls = await this.getUrls(page, metadata);
+    const urls = await this.getUrls(page);
     await page.close();
 
     const getProductFromPage = limit(
@@ -79,25 +72,47 @@ export class CoffeeShopBase {
         await page.goto(url, { waitUntil: 'networkidle2' });
 
         try {
+          if ('setupProductPage' in this) {
+            // @ts-ignore
+            await this.setupProductPage(page);
+          }
+
+          const prices: Partial<Record<Size, number>> = {};
+          // @ts-ignore
+          for (const _size in this.constructor.sizes) {
+            try {
+              const size = _size as Size;
+              const price = await this.getPrice(page, size);
+              prices[size] = price;
+            } catch (e) {
+              if (!(e instanceof SkipError)) {
+                throw e;
+              }
+            }
+          }
+
+          if (Object.keys(prices).length === 0) {
+            throw new SkipError('Sold out');
+          }
+
           const cuppingScore =
             'getCuppingScore' in this
               ? // @ts-ignore
-                await this.getCuppingScore(page, metadata)
+                await this.getCuppingScore(page)
               : ('N/A' as const);
-          const name = await this.getName(page, metadata);
+          const name = await this.getName(page);
           const origin =
             'getOrigin' in this
               ? // @ts-ignore
-                await this.getOrigin(page, metadata)
+                await this.getOrigin(page)
               : ('N/A' as const);
-          const price = await this.getPrice(page, metadata);
-          const tastingNotes = await this.getTastingNotes(page, metadata);
+          const tastingNotes = await this.getTastingNotes(page);
 
           return {
             cuppingScore,
             name,
             origin,
-            price,
+            prices,
             tastingNotes,
             url,
           };
@@ -115,12 +130,21 @@ export class CoffeeShopBase {
       },
     );
 
-    const unfilteredProducts = await mapAsync(urls, getProductFromPage);
+    const unfilteredProducts: Coffee[] = await mapAsync(
+      urls,
+      getProductFromPage,
+    );
     await browser.close();
 
     const products = unfilteredProducts
       .filter((p) => p)
-      .sort((a, b) => a.price - b.price);
+      .sort(
+        (a, b) =>
+          // @ts-ignore
+          a.prices[this.constructor.defaultSize] -
+          // @ts-ignore
+          b.prices[this.constructor.defaultSize],
+      );
 
     const cache = new Cache();
     const lastCache = (await cache.get<Coffee[]>(this.constructor.name)) ?? [];

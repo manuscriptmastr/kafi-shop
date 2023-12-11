@@ -1,9 +1,4 @@
-import {
-  CoffeeShopBase,
-  CoffeeShopProperties,
-  Metadata,
-  Size,
-} from '@models/coffee.js';
+import { CoffeeShopBase, CoffeeShopProperties, Size } from '@models/coffee.js';
 import { SkipError } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
@@ -33,7 +28,7 @@ export class Sey extends CoffeeShopBase implements CoffeeShopProperties {
     );
   }
 
-  async getPrice(page: Page, { size }: Metadata) {
+  async getPrice(page: Page, size: Size) {
     if (
       !(await page.$('select')) ||
       !!(await page.$(`option::-p-text(${Sey.sizes[size]} - Sold Out)`))

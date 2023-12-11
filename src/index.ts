@@ -6,13 +6,14 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 /**
+ * @todo Compute new flag in template instead of in shop.
  * @todo Use a plain function for getProducts() instead of extended class.
- * @todo Scrape all sizes from products, and use size option to filter results.
+ * @todo Consider making shop.sizes object accept array properties of size selectors to account for inconsistent labels.
  */
 
 interface UserInput {
   shop: Shop;
-  size?: Size;
+  size: Size;
   template: Template;
 }
 
@@ -27,6 +28,7 @@ const input: UserInput = yargs(hideBin(process.argv))
       })
       .option('size', {
         choices: Object.values(Size),
+        default: Size.None,
         type: 'string',
       })
       .option('template', {
@@ -38,10 +40,10 @@ const input: UserInput = yargs(hideBin(process.argv))
   .version(false).argv;
 
 const shop = SHOPS[input.shop];
+const size = input.size;
 const template = TEMPLATES[input.template];
-const size = input.size ?? shop.defaultSize;
 
-if (!(size in shop.sizes)) {
+if (size !== Size.None && !(size in shop.sizes)) {
   console.error(
     `Coffee shop "${
       shop.name
@@ -54,5 +56,5 @@ if (!(size in shop.sizes)) {
 
 const metadata = { size };
 
-const products = await new shop().getProducts(metadata);
+const products = await new shop().getProducts();
 console.log(template(shop, products, metadata));

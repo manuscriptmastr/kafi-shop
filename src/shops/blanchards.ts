@@ -1,9 +1,4 @@
-import {
-  CoffeeShopBase,
-  CoffeeShopProperties,
-  Metadata,
-  Size,
-} from '@models/coffee.js';
+import { CoffeeShopBase, CoffeeShopProperties, Size } from '@models/coffee.js';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
@@ -36,7 +31,7 @@ export class Blanchards extends CoffeeShopBase implements CoffeeShopProperties {
     }
   }
 
-  async getPrice(page: Page, { size }: Metadata) {
+  async getPrice(page: Page, size: Size) {
     const option1 = await page.$(`a[data-value="${Blanchards.sizes[size]}"]`);
     const option2 = await page.$(`a[data-value="${size}"]`);
     const button = (option1 || option2)!;

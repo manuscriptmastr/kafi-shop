@@ -1,9 +1,4 @@
-import {
-  CoffeeShopBase,
-  CoffeeShopProperties,
-  Metadata,
-  Size,
-} from '@models/coffee.js';
+import { CoffeeShopBase, CoffeeShopProperties, Size } from '@models/coffee.js';
 import { SkipError, capitalize } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
@@ -34,22 +29,20 @@ export class Manhattan extends CoffeeShopBase implements CoffeeShopProperties {
     return capitalize(origin);
   }
 
-  async getPrice(page: Page, { size }: Metadata) {
-    const filterButton = await page.$('button::-p-text(Filter)');
-
-    if (!filterButton) {
-      throw new SkipError('Filter option does not exist');
-    } else {
-      await filterButton.click();
-    }
-
-    const priceText = await page.$eval(
+  async getPrice(page: Page, size: Size) {
+    const option = await page.$(
       `::-p-text(${Manhattan.sizes[size]} whole coffee beans)`,
-      (el) =>
-        el.parentElement!.nextElementSibling!.firstElementChild!.textContent!.trim(),
     );
 
-    return currency(priceText, {
+    if (!option) {
+      throw new SkipError(`Size "${Manhattan.sizes[size]}" does not exist`);
+    }
+
+    const price = await option.evaluate((el) =>
+      el.parentElement!.nextElementSibling!.firstElementChild!.textContent!.trim(),
+    );
+
+    return currency(price, {
       symbol: '',
       decimal: ',',
     }).value;
@@ -71,5 +64,15 @@ export class Manhattan extends CoffeeShopBase implements CoffeeShopProperties {
       `a[href^="${Manhattan.url}/catalog/coffee/"]`,
       (anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href),
     );
+  }
+
+  async setupProductPage(page: Page) {
+    const filterButton = await page.$('button::-p-text(Filter)');
+
+    if (!filterButton) {
+      throw new SkipError('Filter option does not exist');
+    } else {
+      await filterButton.click();
+    }
   }
 }

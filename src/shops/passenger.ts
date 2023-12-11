@@ -1,9 +1,4 @@
-import {
-  CoffeeShopBase,
-  CoffeeShopProperties,
-  Metadata,
-  Size,
-} from '@models/coffee.js';
+import { CoffeeShopBase, CoffeeShopProperties, Size } from '@models/coffee.js';
 import { SkipError, capitalize } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
@@ -36,7 +31,7 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
     return capitalize(origin);
   }
 
-  async getPrice(page: Page, { size }: Metadata) {
+  async getPrice(page: Page, size: Size) {
     const option = await page.$(`text/${Passenger.sizes[size]}`);
     if (!option) {
       throw new SkipError(`Size "${Passenger.sizes[size]}" does not exist`);
@@ -89,9 +84,13 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
         anchors
           .filter(
             (a) =>
-              ![/necessary/i, /instant/i, /set/i, /subscription/i].some((str) =>
-                a.textContent!.trim().match(str),
-              ),
+              ![
+                /bundle/i,
+                /necessary/i,
+                /instant/i,
+                /set/i,
+                /subscription/i,
+              ].some((str) => a.textContent!.trim().match(str)),
           )
           .map((a) => a.href),
     );
