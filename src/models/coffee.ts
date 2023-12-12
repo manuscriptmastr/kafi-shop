@@ -1,6 +1,5 @@
 import { SkipError, limit, mapAsync } from '@utils';
 import puppeteer, { Page } from 'puppeteer';
-import { Cache } from '../cache.js';
 
 export interface Coffee {
   cuppingScore: number | 'N/A';
@@ -11,17 +10,13 @@ export interface Coffee {
   url: string;
 }
 
-export interface CoffeeWithNewFlag extends Coffee {
-  new: boolean;
-}
-
 export interface CoffeeShopProperties {
   getTastingNotes: (page: Page) => Promise<string[]>;
   getName: (page: Page) => Promise<string>;
   getOrigin?: (page: Page) => Promise<string>;
   getCuppingScore?: (page: Page) => Promise<number | 'N/A'>;
   getPrice: (page: Page, size: Size) => Promise<number>;
-  getProducts: () => Promise<CoffeeWithNewFlag[]>;
+  getProducts: () => Promise<Coffee[]>;
   getUrls: (page: Page) => Promise<string[]>;
   setupProductPage?: (page: Page) => Promise<void>;
 }
@@ -146,16 +141,6 @@ export class CoffeeShopBase {
           b.prices[this.constructor.defaultSize],
       );
 
-    const cache = new Cache();
-    const lastCache = (await cache.get<Coffee[]>(this.constructor.name)) ?? [];
-
-    const productsWithNewFlag = products.map((product) => ({
-      ...product,
-      new: !lastCache.some(({ url }) => product.url === url),
-    }));
-
-    await cache.set(this.constructor.name, products);
-
-    return productsWithNewFlag;
+    return products;
   }
 }

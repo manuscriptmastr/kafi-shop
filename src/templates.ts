@@ -1,4 +1,4 @@
-import { CoffeeWithNewFlag, Size } from '@models/coffee.js';
+import { Coffee, Size } from '@models/coffee.js';
 import { CoffeeShop } from '@shops/index.js';
 import currency from 'currency.js';
 
@@ -8,32 +8,38 @@ export enum Template {
 }
 
 interface Metadata {
+  previous?: Coffee[];
   size: Size;
 }
 
 export const jsonTemplate = (
   coffeeShop: CoffeeShop,
-  coffees: CoffeeWithNewFlag[],
-  metadata: Metadata,
+  coffees: Coffee[],
+  { previous = [], size }: Metadata,
 ) =>
   coffees
-    .filter(({ prices }) =>
-      metadata.size === Size.None ? true : metadata.size in prices,
-    )
+    .filter(({ prices }) => (size === Size.None ? true : size in prices))
+    .map((coffee) => ({
+      ...coffee,
+      new: !previous.some(({ url }) => coffee.url === url),
+    }))
     .map(({ prices, ...coffee }) =>
-      metadata.size === Size.None
+      size === Size.None
         ? { ...coffee, prices }
-        : { ...coffee, price: prices[metadata.size] },
+        : { ...coffee, price: prices[size] },
     );
 
 export const markdownTemplate = (
   coffeeShop: CoffeeShop,
-  coffees: CoffeeWithNewFlag[],
-  metadata: Metadata,
+  _coffees: Coffee[],
+  { previous = [], size: _size }: Metadata,
 ) => {
-  const size =
-    metadata.size === Size.None ? coffeeShop.defaultSize : metadata.size;
-  const coffeesToList = (coffees: CoffeeWithNewFlag[]) =>
+  const coffees = _coffees.map((coffee) => ({
+    ...coffee,
+    new: !previous.some(({ url }) => coffee.url === url),
+  }));
+  const size = _size === Size.None ? coffeeShop.defaultSize : _size;
+  const coffeesToList = (coffees: (Coffee & { new: boolean })[]) =>
     coffees.length
       ? coffees
           .filter(({ prices }) => size in prices)

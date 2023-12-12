@@ -1,12 +1,12 @@
 #!/usr/bin/env -S node
-import { Size } from '@models/coffee.js';
+import { Coffee, Size } from '@models/coffee.js';
 import { SHOPS, Shop } from '@shops/index.js';
+import { Cache } from 'cache.js';
 import { TEMPLATES, Template } from 'templates.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 /**
- * @todo Compute new flag in template instead of in shop.
  * @todo Use a plain function for getProducts() instead of extended class.
  * @todo Consider making shop.sizes object accept array properties of size selectors to account for inconsistent labels.
  */
@@ -54,7 +54,10 @@ if (size !== Size.None && !(size in shop.sizes)) {
   process.exit();
 }
 
-const metadata = { size };
+const lastCache = await Cache.get<Coffee[]>(shop.name);
 
 const products = await new shop().getProducts();
+await Cache.set(shop.name, products);
+
+const metadata = { previous: lastCache, size };
 console.log(template(shop, products, metadata));

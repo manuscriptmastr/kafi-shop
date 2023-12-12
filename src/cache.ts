@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { CACHE_DIR } from './constants.js';
 
 export class Cache {
-  async get<T>(key: string) {
+  static async get<T>(key: string) {
     const dir = resolve(CACHE_DIR, key);
     try {
       const filenames = await readdir(dir);
@@ -17,7 +17,7 @@ export class Cache {
     }
   }
 
-  async set<T>(key: string, value: T) {
+  static async set<T>(key: string, value: T) {
     const unixTimestamp = Date.now();
     const dir = resolve(CACHE_DIR, key);
     await mkdir(dir, { recursive: true });
