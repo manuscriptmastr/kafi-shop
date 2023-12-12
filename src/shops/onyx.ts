@@ -39,7 +39,7 @@ export class Onyx extends CoffeeShopBase implements CoffeeShopProperties {
 
   async getPrice(page: Page, size: Size) {
     const option = await page.$(
-      `span.generic-option[data-value="${Onyx.sizes[size]}"]`,
+      `span.generic-option[data-option="${Onyx.sizes[size]}"]`,
     );
 
     if (!option) {
@@ -48,7 +48,7 @@ export class Onyx extends CoffeeShopBase implements CoffeeShopProperties {
 
     await option.click();
 
-    const priceText = await page.$eval('div.price.variant-price', (div) =>
+    const priceText = await page.$eval('div.price', (div) =>
       div.textContent!.trim(),
     );
 
