@@ -6,11 +6,6 @@ import { TEMPLATES, Template } from 'templates.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-/**
- * @todo Use a plain function for getProducts() instead of extended class.
- * @todo Consider making shop.sizes object accept array properties of size selectors to account for inconsistent labels.
- */
-
 interface UserInput {
   shop: Shop;
   size: Size;
