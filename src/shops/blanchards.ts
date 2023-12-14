@@ -1,4 +1,5 @@
 import { CoffeeShopBase, CoffeeShopProperties, Size } from '@models/coffee.js';
+import { SkipError } from '@utils';
 import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
@@ -34,8 +35,11 @@ export class Blanchards extends CoffeeShopBase implements CoffeeShopProperties {
   async getPrice(page: Page, size: Size) {
     const option1 = await page.$(`a[data-value="${Blanchards.sizes[size]}"]`);
     const option2 = await page.$(`a[data-value="${size}"]`);
-    const button = (option1 || option2)!;
-    await button.click();
+    const option = option1 || option2;
+    if (!option) {
+      throw new SkipError(`Size "${Blanchards.sizes[size]}" does not exist`);
+    }
+    await option.click();
     const price = await page.$eval(
       'span[data-smartrr-subscribe-price]',
       (span: HTMLSpanElement) => {
@@ -60,7 +64,7 @@ export class Blanchards extends CoffeeShopBase implements CoffeeShopProperties {
       anchors
         .filter(
           (a) =>
-            ![/instant/i, /set/i, /subscription/i].some((str) =>
+            ![/box/i, /instant/i, /set/i, /subscription/i].some((str) =>
               a.firstElementChild!.textContent!.trim().match(str),
             ),
         )
