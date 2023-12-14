@@ -23,9 +23,14 @@ export class Monogram extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async getOrigin(page: Page) {
-    return page.$eval('text/ORIGIN: ', (el) =>
-      el.firstChild!.textContent!.trim().split('ORIGIN: ').at(-1)!.trim(),
-    );
+    const origin = await page.$('text/ORIGIN: ');
+    if (origin) {
+      return origin.evaluate((el) =>
+        el.firstChild!.textContent!.trim().split('ORIGIN: ').at(-1)!.trim(),
+      );
+    } else {
+      return 'N/A';
+    }
   }
 
   async getPrice(page: Page, size: Size) {
