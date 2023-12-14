@@ -9,6 +9,7 @@ export class Sey extends CoffeeShopBase implements CoffeeShopProperties {
   static defaultSize = Size.TwoHundredFiftyGrams;
   static name = 'Sey';
   static sizes: Partial<Record<Size, string>> = {
+    [Size.OneHundredTwentyFiveGrams]: '125g',
     [Size.TwoHundredFiftyGrams]: '250g',
     [Size.TwoPounds]: '2lb',
     [Size.FivePounds]: '5lb',
@@ -29,20 +30,21 @@ export class Sey extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async getPrice(page: Page, size: Size) {
-    if (
-      !(await page.$('select')) ||
-      !!(await page.$(`option::-p-text(${Sey.sizes[size]} - Sold Out)`))
-    ) {
-      throw new SkipError(
-        `Size "${Sey.sizes[size]}" is sold out or does not exist`,
-      );
+    const option = await page.$(`option::-p-text(${Sey.sizes[size]})`);
+
+    if (!option) {
+      throw new SkipError(`Size "${Sey.sizes[size]}" does not exist`);
     }
-    const priceString = await page.$eval(
-      `option::-p-text(${Sey.sizes[size]})`,
-      (option: HTMLOptionElement) =>
-        option.textContent!.trim().split(' - ')[1]!,
+
+    const price = await option.evaluate((option: HTMLOptionElement) =>
+      option.textContent!.trim(),
     );
-    return currency(priceString).value;
+
+    if (price.match(/sold out/i)) {
+      throw new SkipError(`Size "${Sey.sizes[size]}" is sold out`);
+    }
+
+    return currency(price.split(' - ')[1]!).value;
   }
 
   async getTastingNotes(page: Page) {
