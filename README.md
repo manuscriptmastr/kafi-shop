@@ -14,6 +14,7 @@ Node.js shopping CLI for specialty coffee. Currently supports:
 - [Monogram Coffee](https://monogramcoffee.com/en-us/)
 - [Onyx Coffee Lab](https://onyxcoffeelab.com/)
 - [Passenger](https://www.passengercoffee.com/)
+- [Roseline Coffee](https://roselinecoffee.com/)
 - [Sey](https://www.seycoffee.com/)
 
 ## Installation
@@ -33,7 +34,7 @@ npm link
 ## CLI
 
 ```shell
-kafi-shop <black-and-white|blanchards|ceremony|coffea-circulor|color|george-howell|ilse|luna|manhattan|onyx|passenger|sey> [size] [template]
+kafi-shop <black-and-white|blanchards|ceremony|coffea-circulor|color|george-howell|ilse|luna|manhattan|onyx|passenger|roseline|sey> [size] [template]
 ```
 
 `kafi-shop sey --size 250g --template markdown` generates:
