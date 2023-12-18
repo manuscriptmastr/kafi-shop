@@ -11,12 +11,12 @@ export interface Coffee {
 }
 
 export interface CoffeeShopProperties {
-  getTastingNotes: (page: Page) => Promise<string[]>;
+  getCuppingScore?: (page: Page) => Promise<number | 'N/A'>;
   getName: (page: Page) => Promise<string>;
   getOrigin?: (page: Page) => Promise<string>;
-  getCuppingScore?: (page: Page) => Promise<number | 'N/A'>;
   getPrice: (page: Page, size: Size) => Promise<number>;
   getProducts: () => Promise<Coffee[]>;
+  getTastingNotes: (page: Page) => Promise<string[]>;
   getUrls: (page: Page) => Promise<string[]>;
   setupProductPage?: (page: Page) => Promise<void>;
 }
@@ -36,6 +36,7 @@ export enum Size {
   EightOunces = '8oz',
   TenOunces = '10oz',
   TwelveOunces = '12oz',
+  OnePound = '1lb',
   TwoPounds = '2lb',
   TwoAndAHalfPounds = '2.5lb',
   FivePounds = '5lb',

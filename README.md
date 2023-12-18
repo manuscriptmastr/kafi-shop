@@ -6,6 +6,7 @@ Node.js shopping CLI for specialty coffee. Currently supports:
 - [Blanchard's Coffee](https://blanchardscoffee.com/)
 - [Ceremony Coffee Roasters](https://shop.ceremonycoffee.com/)
 - [Coffea Circulor](https://coffeacirculor.com/)
+- [Color Coffee Roasters](https://colorroasters.com/)
 - [George Howell Coffee](https://georgehowellcoffee.com/)
 - [Ilse Coffee](https://ilsecoffee.com/)
 - [Luna](https://enjoylunacoffee.com/)
@@ -32,7 +33,7 @@ npm link
 ## CLI
 
 ```shell
-kafi-shop <black-and-white|blanchards|ceremony|coffea-circulor|george-howell|ilse|luna|manhattan|onyx|passenger|sey> [size] [template]
+kafi-shop <black-and-white|blanchards|ceremony|coffea-circulor|color|george-howell|ilse|luna|manhattan|onyx|passenger|sey> [size] [template]
 ```
 
 `kafi-shop sey --size 250g --template markdown` generates:
