@@ -1,5 +1,7 @@
 import { CoffeeShopBase, CoffeeShopProperties, Size } from '@models/coffee.js';
 import { SkipError } from '@utils';
+import { ConversionRate } from 'constants.js';
+import currency from 'currency.js';
 import { Page } from 'puppeteer';
 
 export class CoffeaCirculor
@@ -56,7 +58,7 @@ export class CoffeaCirculor
           (el) => +el.textContent!.slice(1).replace(',', '') / 100,
         );
 
-        prices.push(price);
+        prices.push(currency(price).multiply(ConversionRate.EURO_TO_USD).value);
       }
     }
 
@@ -93,9 +95,14 @@ export class CoffeaCirculor
         anchors
           .filter(
             (a) =>
-              ![/bag/i, /hyperfood/i, /poster/i, /-set/i, /shirt/i].some(
-                (pattern) => pattern.test(a.href),
-              ),
+              ![
+                /bag/i,
+                /gift-card/i,
+                /hyperfood/i,
+                /poster/i,
+                /-set/i,
+                /shirt/i,
+              ].some((pattern) => pattern.test(a.href)),
           )
           .map((a) => a.href),
     );
