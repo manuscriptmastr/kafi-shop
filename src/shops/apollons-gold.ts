@@ -22,7 +22,15 @@ export class ApollonsGold
   }
 
   async getOrigin(page: Page) {
-    return 'N/A';
+    return page.$eval(
+      'text/Area:',
+      (el) =>
+        Array.from(el.childNodes)
+          .map((e) => e.textContent!)
+          .find((text) => /Area:\s/.test(text))!
+          .split(/Area:\s/)
+          .at(-1)!,
+    );
   }
 
   async getPrice(page: Page, size: Size) {
@@ -51,7 +59,17 @@ export class ApollonsGold
   }
 
   async getTastingNotes(page: Page) {
-    return [];
+    const notes1 = await page.$('text/Tasting notes:');
+    const notes2 = await page.$('text/Notes:');
+    const notes = (notes1 || notes2)!;
+    return notes.evaluate((el) =>
+      Array.from(el.childNodes)
+        .map((e) => e.textContent!)
+        .find((text) => /(Tasting notes|Notes):\s/.test(text!))!
+        .split(/(Tasting notes|Notes):\s/)
+        .at(-1)!
+        .split(', '),
+    );
   }
 
   async getUrls(page: Page) {
