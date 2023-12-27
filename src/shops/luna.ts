@@ -20,7 +20,15 @@ export class Luna extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async getOrigin(page: Page) {
-    return page.$eval('text/Place:', (el) => el.textContent!.trim());
+    const place = (await page.$('text/Place:'))!;
+    return place.evaluate(
+      (el) =>
+        Array.from(el.childNodes)
+          .map((e) => e.textContent!)
+          .find((text) => /Place:\s/.test(text!))!
+          .split(/Place:\s/)
+          .at(-1)!,
+    );
   }
 
   async getPrice(page: Page, size: Size) {
@@ -42,7 +50,17 @@ export class Luna extends CoffeeShopBase implements CoffeeShopProperties {
   }
 
   async getTastingNotes(page: Page) {
-    return page.$eval('text/Tasting notes:', (el) => [el.textContent!.trim()]);
+    const notes1 = await page.$('text/Tasting notes:');
+    const notes2 = await page.$('text/Character:');
+    const notes = (notes1 || notes2)!;
+    return notes.evaluate((el) =>
+      Array.from(el.childNodes)
+        .map((e) => e.textContent!)
+        .find((text) => /(Tasting notes|Character):\s/.test(text!))!
+        .split(/(Tasting notes|Character):\s/)
+        .at(-1)!
+        .split(', '),
+    );
   }
 
   async getUrls(page: Page) {
