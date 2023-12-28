@@ -11,6 +11,7 @@ Node.js shopping CLI for specialty coffee. Currently supports:
 - [George Howell Coffee](https://georgehowellcoffee.com/)
 - [Ilse Coffee](https://ilsecoffee.com/)
 - [La Cabra](https://www.lacabra.dk/)
+- [Leuchtfeuer](https://www.leuchtfeuer.coffee/)
 - [Luna](https://enjoylunacoffee.com/)
 - [Manhattan Coffee Roasters](https://manhattancoffeeroasters.com/)
 - [Monogram Coffee](https://monogramcoffee.com/en-us/)
@@ -38,7 +39,7 @@ npm link
 ## CLI
 
 ```shell
-kafi-shop <apollons-gold|black-and-white|blanchards|ceremony|coffea-circulor|color|george-howell|ilse|la-cabra|luna|manhattan|onyx|passenger|roseline|sey> [size] [template]
+kafi-shop <apollons-gold|black-and-white|blanchards|ceremony|coffea-circulor|color|george-howell|ilse|la-cabra|leuchtfeuer|luna|manhattan|onyx|passenger|roseline|sey> [size] [template]
 ```
 
 `kafi-shop sey --size 250g --template markdown` generates:
