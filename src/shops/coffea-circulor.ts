@@ -21,10 +21,13 @@ export class CoffeaCirculor
   static url = 'https://coffeacirculor.com';
 
   async getCuppingScore(page: Page) {
+    const score1 = await page.$('text/SCA SCORE');
+    const score2 = await page.$('text/QUALITY');
+    const score = (score1 || score2)!;
     return Number(
-      await page.$eval(
-        'text/SCA SCORE',
-        (el) => el.parentElement!.textContent!.split(/SCA SCORE\s/)[1],
+      await score.evaluate(
+        (el) =>
+          el.parentElement!.textContent!.split(/(SCA SCORE|QUALITY):\s/)[1],
       ),
     );
   }
