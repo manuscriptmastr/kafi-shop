@@ -88,6 +88,7 @@ export class Passenger extends CoffeeShopBase implements CoffeeShopProperties {
                 /bundle/i,
                 /necessary/i,
                 /instant/i,
+                /lots/i,
                 /set/i,
                 /subscription/i,
               ].some((str) => a.textContent!.trim().match(str)),
